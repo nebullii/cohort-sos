@@ -151,6 +151,76 @@ export function createSeed(): CohortState {
         rewards: [],
       },
       {
+        id: "s5",
+        title: "Prisma migrate failing on Neon — column already exists",
+        category: "Database",
+        urgency: "High",
+        status: "open",
+        requesterId: "u4",
+        helperIds: [],
+        context:
+          "I added a new column locally and ran `prisma migrate dev`. Now on Neon prod, `migrate deploy` fails with 'column already exists'. Did I break shadow DB? Migration history looks fine.",
+        repoUrl: "https://github.com/mayabuilds/cohort-data",
+        liveUrl: "",
+        timeNeededMinutes: 15,
+        createdAt: minutesAgo(8),
+        comments: [],
+        rewards: [],
+      },
+      {
+        id: "s6",
+        title: "Stripe webhook 401 from local ngrok tunnel",
+        category: "Backend",
+        urgency: "Medium",
+        status: "open",
+        requesterId: "u6",
+        helperIds: [],
+        context:
+          "Webhook signature verification fails locally. Stripe dashboard shows 401. STRIPE_WEBHOOK_SECRET is set. Suspect raw body vs parsed body issue in Next.js App Router.",
+        repoUrl: "https://github.com/arikim/cohort-billing",
+        liveUrl: "",
+        timeNeededMinutes: 20,
+        createdAt: minutesAgo(34),
+        comments: [],
+        rewards: [],
+      },
+      {
+        id: "s7",
+        title: "Demo video has 8s of dead air — need a tighter cut",
+        category: "Pitch",
+        urgency: "Low",
+        status: "resolved",
+        requesterId: "u2",
+        helperIds: ["u6"],
+        context:
+          "Loom is 2:14 but the first 8 seconds feel slow. I have 90 minutes left and can't tell what to cut.",
+        repoUrl: "",
+        liveUrl: "https://www.loom.com/share/example",
+        timeNeededMinutes: 15,
+        createdAt: hoursAgo(14),
+        resolvedAt: hoursAgo(13),
+        fixNote:
+          "Cut the intro slide entirely and started on the live product. New opening: 'This is what happens when a builder in our cohort gets stuck.' Cut total down to 1:48.",
+        comments: [
+          comment(
+            "c4",
+            "u6",
+            "Open on the product, not the problem statement. The problem reveals itself.",
+            820,
+          ),
+        ],
+        rewards: [
+          reward(
+            "r3",
+            "s7",
+            "u2",
+            "u6",
+            "unblocked",
+            "Ari cut 26 seconds in 5 minutes.",
+          ),
+        ],
+      },
+      {
         id: "s4",
         title: "Mobile layout broken on project cards",
         category: "Frontend",
@@ -167,6 +237,7 @@ export function createSeed(): CohortState {
         resolvedAt: hoursAgo(6),
         fixNote:
           "The card grid used fixed columns and a long unbreakable URL. We changed the layout to one column below 640px, added min-width: 0 to the card body, and used overflow-wrap: anywhere on links.",
+        fixCommitUrl: "https://github.com/arikim/project-wall/commit/9d5ba31",
         comments: [
           comment(
             "c2",

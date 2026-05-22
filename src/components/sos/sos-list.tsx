@@ -1,7 +1,9 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
+import { onShortcut } from "@/lib/shortcut-bus";
 import {
   Select,
   SelectContent,
@@ -40,6 +42,16 @@ interface SosListProps {
 
 export function SosList({ filters, setFilters, selectedId, onSelect }: SosListProps) {
   const { state } = useStore();
+  const searchRef = useRef<HTMLInputElement>(null);
+
+  useEffect(
+    () =>
+      onShortcut("focus-search", () => {
+        searchRef.current?.focus();
+        searchRef.current?.select();
+      }),
+    [],
+  );
 
   const filtered = state.sosRequests
     .filter((sos) => {
@@ -80,13 +92,17 @@ export function SosList({ filters, setFilters, selectedId, onSelect }: SosListPr
         <div className="relative">
           <Search className="text-muted-foreground pointer-events-none absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2" />
           <Input
+            ref={searchRef}
             value={filters.search}
             onChange={(e) =>
               setFilters((prev) => ({ ...prev, search: e.target.value }))
             }
             placeholder="Search"
-            className="h-8 pl-8 text-sm"
+            className="h-8 pl-8 pr-12 text-sm"
           />
+          <kbd className="border-border bg-muted text-muted-foreground pointer-events-none absolute right-2 top-1/2 hidden -translate-y-1/2 rounded border px-1 text-[10px] font-medium sm:inline-block">
+            ⌘K
+          </kbd>
         </div>
         <div className="grid grid-cols-3 gap-1.5">
           <Select

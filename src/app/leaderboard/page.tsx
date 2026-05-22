@@ -15,6 +15,7 @@ import {
   FlaskConical,
   NotebookPen,
   Zap,
+  Flame,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useStore } from "@/lib/store";
@@ -73,6 +74,41 @@ function badgesFor(user: User, sosList: SosRequest[]): BadgeName[] {
   return badges.length ? badges : ["Ready to Rescue"];
 }
 
+function userStats(user: User, sosList: SosRequest[]) {
+  const sevenDaysAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+  const userRewards = sosList.flatMap((sos) =>
+    sos.rewards.filter((r) => r.toUserId === user.id),
+  );
+  const weeklyPoints = userRewards
+    .filter((r) => new Date(r.createdAt).getTime() >= sevenDaysAgo)
+    .reduce((sum, r) => sum + r.points, 0);
+
+  const dayKeys = new Set(
+    userRewards.map((r) => new Date(r.createdAt).toISOString().slice(0, 10)),
+  );
+  let streak = 0;
+  const today = new Date();
+  for (let i = 0; i < 30; i++) {
+    const d = new Date(today);
+    d.setDate(today.getDate() - i);
+    if (dayKeys.has(d.toISOString().slice(0, 10))) streak++;
+    else if (i > 0) break;
+  }
+
+  const helped = sosList.filter(
+    (sos) => sos.helperIds.includes(user.id) && sos.status === "resolved",
+  );
+  const catCounts = helped.reduce<Record<string, number>>((acc, sos) => {
+    acc[sos.category] = (acc[sos.category] ?? 0) + 1;
+    return acc;
+  }, {});
+  const specialty = Object.entries(catCounts).sort(
+    (a, b) => b[1] - a[1],
+  )[0]?.[0];
+
+  return { weeklyPoints, streak, specialty };
+}
+
 function rankAccent(rank: number) {
   if (rank === 0) return { icon: Crown, label: "#1", className: "text-amber-600" };
   if (rank === 1) return { icon: Trophy, label: "#2", className: "text-zinc-500" };
@@ -111,6 +147,7 @@ export default function LeaderboardPage() {
         {ranked.map((user, i) => {
           const badges = badgesFor(user, state.sosRequests);
           const accent = rankAccent(i);
+          const stats = userStats(user, state.sosRequests);
           return (
             <Card key={user.id} className="overflow-hidden">
               <CardContent className="space-y-4 p-5">
@@ -148,6 +185,27 @@ export default function LeaderboardPage() {
                     {user.rescueRep}
                   </span>
                   <span className="text-muted-foreground text-xs">rep</span>
+                  {stats.weeklyPoints > 0 ? (
+                    <span className="text-emerald-700 ml-auto text-xs font-medium tabular-nums">
+                      +{stats.weeklyPoints} this week
+                    </span>
+                  ) : null}
+                </div>
+                <div className="text-muted-foreground flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px]">
+                  {stats.specialty ? (
+                    <span>
+                      Specialty:{" "}
+                      <span className="text-foreground font-medium">
+                        {stats.specialty}
+                      </span>
+                    </span>
+                  ) : null}
+                  {stats.streak > 1 ? (
+                    <span className="text-foreground inline-flex items-center gap-1">
+                      <Flame className="size-3 text-orange-600" />
+                      {stats.streak}-day streak
+                    </span>
+                  ) : null}
                 </div>
                 <div className="flex flex-wrap gap-1">
                   {badges.map((badge) => {

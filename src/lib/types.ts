@@ -81,6 +81,7 @@ export interface SosRequest {
   createdAt: string;
   resolvedAt?: string;
   fixNote?: string;
+  fixCommitUrl?: string;
   comments: SosComment[];
   rewards: Reward[];
 }

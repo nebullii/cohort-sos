@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { LaunchDialog } from "@/components/sos/launch-dialog";
+import { onShortcut } from "@/lib/shortcut-bus";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -18,6 +19,8 @@ export function Topbar() {
   const { reset } = useStore();
   const pathname = usePathname();
   const [launchOpen, setLaunchOpen] = useState(false);
+
+  useEffect(() => onShortcut("new-sos", () => setLaunchOpen(true)), []);
 
   return (
     <header className="bg-background border-border sticky top-0 z-30 border-b">
@@ -59,6 +62,9 @@ export function Topbar() {
           </Button>
           <Button size="sm" onClick={() => setLaunchOpen(true)}>
             New SOS
+            <kbd className="border-foreground/20 bg-foreground/10 text-foreground/80 ml-1.5 hidden rounded border px-1 text-[10px] font-medium sm:inline-block">
+              ⌘N
+            </kbd>
           </Button>
         </div>
       </div>

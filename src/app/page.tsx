@@ -5,6 +5,7 @@ import { SosList } from "@/components/sos/sos-list";
 import { Conversation } from "@/components/sos/conversation";
 import { ContextPanel } from "@/components/sos/context-panel";
 import { useStore } from "@/lib/store";
+import { cn } from "@/lib/utils";
 
 const URGENCY_RANK: Record<string, number> = {
   "Deadline Panic": 0,
@@ -39,15 +40,21 @@ export default function HelpBoardPage() {
     sortedRequests[0] ??
     null;
 
+  const showDetailOnMobile = selectedId !== null;
+
   return (
     <div className="bg-background border-border grid h-[calc(100vh-7rem)] grid-cols-1 overflow-hidden rounded-lg border md:grid-cols-[320px_minmax(0,1fr)] lg:grid-cols-[320px_minmax(0,1fr)_300px]">
-      <SosList
-        filters={filters}
-        setFilters={setFilters}
-        selectedId={activeSos?.id ?? null}
-        onSelect={setSelectedId}
-      />
-      <Conversation sos={activeSos} />
+      <div className={cn("min-h-0", showDetailOnMobile ? "hidden md:block" : "block")}>
+        <SosList
+          filters={filters}
+          setFilters={setFilters}
+          selectedId={activeSos?.id ?? null}
+          onSelect={setSelectedId}
+        />
+      </div>
+      <div className={cn("min-h-0", showDetailOnMobile ? "block" : "hidden md:block")}>
+        <Conversation sos={activeSos} onBack={() => setSelectedId(null)} />
+      </div>
       <ContextPanel sos={activeSos} />
     </div>
   );

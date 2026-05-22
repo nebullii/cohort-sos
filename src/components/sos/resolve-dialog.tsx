@@ -21,6 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useStore } from "@/lib/store";
+import { celebrateResolve } from "@/lib/celebrate";
 import {
   REWARD_POINTS,
   type RewardType,
@@ -45,6 +46,7 @@ interface HelperSelection {
 export function ResolveDialog({ sos, open, onOpenChange }: ResolveDialogProps) {
   const { state, resolveSos } = useStore();
   const [fixNote, setFixNote] = useState("");
+  const [fixCommitUrl, setFixCommitUrl] = useState("");
   const [kudosMessage, setKudosMessage] = useState("");
 
   const helperCandidates = useMemo(() => {
@@ -60,6 +62,7 @@ export function ResolveDialog({ sos, open, onOpenChange }: ResolveDialogProps) {
   useEffect(() => {
     if (!open) return;
     setFixNote("");
+    setFixCommitUrl("");
     setKudosMessage("");
     const initial: Record<string, HelperSelection> = {};
     helperCandidates.forEach((helper) => {
@@ -80,10 +83,12 @@ export function ResolveDialog({ sos, open, onOpenChange }: ResolveDialogProps) {
     resolveSos({
       sosId: sos.id,
       fixNote,
+      fixCommitUrl,
       kudosMessage,
       helpers,
     });
     onOpenChange(false);
+    celebrateResolve();
   }
 
   return (
@@ -106,6 +111,21 @@ export function ResolveDialog({ sos, open, onOpenChange }: ResolveDialogProps) {
               required
               rows={4}
               placeholder="What fixed it? Include concrete files, settings, or commands."
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="fix-commit">
+              Proof of fix
+              <span className="text-muted-foreground ml-1.5 text-xs font-normal">
+                (optional — commit, PR, or screenshot URL)
+              </span>
+            </Label>
+            <Input
+              id="fix-commit"
+              value={fixCommitUrl}
+              onChange={(e) => setFixCommitUrl(e.target.value)}
+              placeholder="https://github.com/org/repo/commit/abc1234"
             />
           </div>
 

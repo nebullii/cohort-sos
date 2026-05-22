@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Search } from "lucide-react";
+import { ExternalLink, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
 import { timeAgo } from "@/lib/format";
@@ -72,6 +72,17 @@ export default function KnowledgePage() {
                       <p className="text-muted-foreground mt-2 text-sm leading-relaxed">
                         {sos.fixNote ?? "No final fix note recorded."}
                       </p>
+                      {sos.fixCommitUrl ? (
+                        <a
+                          href={sos.fixCommitUrl}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-foreground hover:underline mt-2 inline-flex items-center gap-1 text-xs"
+                        >
+                          <ExternalLink className="size-3 opacity-60" />
+                          {sos.fixCommitUrl.replace(/^https?:\/\//, "")}
+                        </a>
+                      ) : null}
                       {helpers.length > 0 ? (
                         <p className="text-muted-foreground mt-2.5 text-xs">
                           Fixed by{" "}

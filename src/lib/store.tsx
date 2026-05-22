@@ -33,6 +33,7 @@ interface LaunchInput {
 interface ResolveInput {
   sosId: string;
   fixNote: string;
+  fixCommitUrl?: string;
   kudosMessage: string;
   helpers: { userId: string; rewardType: RewardType }[];
 }
@@ -185,6 +186,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
                 status: "resolved" as Status,
                 resolvedAt: now,
                 fixNote: input.fixNote.trim(),
+                fixCommitUrl: input.fixCommitUrl?.trim() || undefined,
                 helperIds,
                 rewards: [...item.rewards, ...newRewards],
               }

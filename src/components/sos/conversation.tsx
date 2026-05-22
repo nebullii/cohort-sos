@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { CheckCircle2, ExternalLink, Send } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ExternalLink, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
@@ -13,9 +13,10 @@ import { timeAgo } from "@/lib/format";
 
 interface ConversationProps {
   sos: SosRequest | null;
+  onBack?: () => void;
 }
 
-export function Conversation({ sos }: ConversationProps) {
+export function Conversation({ sos, onBack }: ConversationProps) {
   const { state, claimSos, addComment } = useStore();
   const [draft, setDraft] = useState("");
   const [resolveOpen, setResolveOpen] = useState(false);
@@ -46,6 +47,16 @@ export function Conversation({ sos }: ConversationProps) {
   return (
     <section className="bg-background grid h-full min-h-0 grid-rows-[auto_1fr_auto]">
       <header className="border-border border-b px-6 py-5">
+        {onBack ? (
+          <button
+            type="button"
+            onClick={onBack}
+            className="text-muted-foreground hover:text-foreground mb-2 inline-flex items-center gap-1 text-xs md:hidden"
+          >
+            <ArrowLeft className="size-3.5" />
+            Back to board
+          </button>
+        ) : null}
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <h2 className="text-foreground text-lg font-semibold leading-tight">
@@ -114,6 +125,17 @@ export function Conversation({ sos }: ConversationProps) {
               <p className="text-foreground mt-2 text-sm leading-relaxed">
                 {sos.fixNote}
               </p>
+              {sos.fixCommitUrl ? (
+                <a
+                  href={sos.fixCommitUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-foreground hover:underline mt-2 inline-flex items-center gap-1 text-xs"
+                >
+                  <ExternalLink className="size-3 opacity-60" />
+                  {sos.fixCommitUrl.replace(/^https?:\/\//, "")}
+                </a>
+              ) : null}
             </div>
           </div>
         ) : null}

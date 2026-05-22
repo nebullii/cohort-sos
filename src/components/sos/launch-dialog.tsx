@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Sparkles } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -30,6 +31,63 @@ interface LaunchDialogProps {
 
 const TIME_OPTIONS = [10, 15, 30, 60];
 
+const TEMPLATES: Record<Category, string> = {
+  Auth: `What's happening:
+
+Where it breaks (local / staging / prod):
+
+What I've tried:
+
+Error message / status:`,
+  Deploy: `What I deployed:
+
+Build log error:
+
+Last working commit:
+
+What I've tried:`,
+  Frontend: `What the UI is doing:
+
+Expected vs actual:
+
+Component / file:
+
+What I've tried:`,
+  Backend: `Endpoint / function:
+
+Expected vs actual response:
+
+Logs:
+
+What I've tried:`,
+  Database: `Query / migration:
+
+Error message:
+
+Schema diff:
+
+What I've tried:`,
+  Design: `What I'm designing:
+
+Constraint / brand rules:
+
+Current attempt (link):
+
+Specific feedback I want:`,
+  Pitch: `Audience:
+
+What I'm pitching (one line):
+
+Specific section that feels off:
+
+Link to current draft:`,
+  Other: `What I'm trying to do:
+
+What's blocking me:
+
+What I've tried:`,
+};
+
 export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
   const { launchSos } = useStore();
   const [title, setTitle] = useState("");
@@ -48,6 +106,10 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
     setRepoUrl("");
     setLiveUrl("");
     setContext("");
+  }
+
+  function applyTemplate() {
+    setContext(TEMPLATES[category]);
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -171,13 +233,23 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
           </div>
 
           <div className="space-y-1.5">
-            <Label htmlFor="sos-context">Context</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="sos-context">Context</Label>
+              <button
+                type="button"
+                onClick={applyTemplate}
+                className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
+              >
+                <Sparkles className="size-3" />
+                Use {category} template
+              </button>
+            </div>
             <Textarea
               id="sos-context"
               value={context}
               onChange={(e) => setContext(e.target.value)}
               required
-              rows={4}
+              rows={6}
               placeholder="What changed, what you tried, and what error you see"
             />
           </div>
