@@ -1,5 +1,6 @@
 "use client";
 
+import { Card, CardContent } from "@/components/ui/card";
 import { useStore } from "@/lib/store";
 import { UserAvatar } from "@/components/sos/user-avatar";
 import { Pill } from "@/components/sos/pills";
@@ -22,7 +23,7 @@ function badgesFor(user: User, sosList: SosRequest[]): string[] {
   if ((counts.Pitch ?? 0) >= 1) badges.push("Pitch Doctor");
   if (helped.length >= 2) badges.push("First Responder");
   if (user.rescueRep >= 35) badges.push("Cohort Hero");
-  return badges;
+  return badges.length ? badges : ["Ready to Rescue"];
 }
 
 export default function LeaderboardPage() {
@@ -52,71 +53,44 @@ export default function LeaderboardPage() {
         </p>
       </header>
 
-      <section>
-        <div className="border-border overflow-hidden rounded-lg border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-border text-muted-foreground border-b text-xs">
-                <th className="w-12 px-4 py-2.5 text-left font-medium">#</th>
-                <th className="px-4 py-2.5 text-left font-medium">Builder</th>
-                <th className="hidden px-4 py-2.5 text-left font-medium md:table-cell">
-                  Skills
-                </th>
-                <th className="hidden px-4 py-2.5 text-left font-medium lg:table-cell">
-                  Badges
-                </th>
-                <th className="px-4 py-2.5 text-right font-medium">Rep</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ranked.map((user, i) => {
-                const badges = badgesFor(user, state.sosRequests);
-                return (
-                  <tr
-                    key={user.id}
-                    className="border-border hover:bg-muted/40 border-b transition-colors last:border-b-0"
-                  >
-                    <td className="text-muted-foreground px-4 py-3 tabular-nums">
-                      {i + 1}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        <UserAvatar user={user} className="size-8" />
-                        <div className="min-w-0">
-                          <div className="text-foreground font-medium">
-                            {user.name}
-                          </div>
-                          <div className="text-muted-foreground text-xs">
-                            @{user.githubHandle}
-                          </div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="text-muted-foreground hidden px-4 py-3 text-xs md:table-cell">
-                      {user.skills.join(", ")}
-                    </td>
-                    <td className="hidden px-4 py-3 lg:table-cell">
-                      <div className="flex flex-wrap gap-1">
-                        {badges.length === 0 ? (
-                          <span className="text-muted-foreground text-xs">
-                            —
-                          </span>
-                        ) : (
-                          badges.map((badge) => (
-                            <Pill key={badge}>{badge}</Pill>
-                          ))
-                        )}
-                      </div>
-                    </td>
-                    <td className="text-foreground px-4 py-3 text-right font-semibold tabular-nums">
-                      {user.rescueRep}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+      <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {ranked.map((user, i) => {
+          const badges = badgesFor(user, state.sosRequests);
+          return (
+            <Card key={user.id} className="overflow-hidden">
+              <CardContent className="space-y-4 p-5">
+                <div className="flex items-center justify-between">
+                  <UserAvatar user={user} className="size-11" />
+                  <span className="text-muted-foreground text-xs font-medium tabular-nums">
+                    #{i + 1}
+                  </span>
+                </div>
+                <div>
+                  <h2 className="text-foreground text-base font-semibold leading-tight">
+                    {user.name}
+                  </h2>
+                  <p className="text-muted-foreground mt-0.5 text-xs">
+                    @{user.githubHandle}
+                  </p>
+                  <p className="text-muted-foreground mt-1 text-xs">
+                    {user.skills.join(" · ")}
+                  </p>
+                </div>
+                <div className="flex items-baseline gap-1.5">
+                  <span className="text-foreground text-3xl font-semibold tabular-nums">
+                    {user.rescueRep}
+                  </span>
+                  <span className="text-muted-foreground text-xs">rep</span>
+                </div>
+                <div className="flex flex-wrap gap-1">
+                  {badges.map((badge) => (
+                    <Pill key={badge}>{badge}</Pill>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
       </section>
 
       <section>
@@ -131,28 +105,27 @@ export default function LeaderboardPage() {
               const from = state.users.find((u) => u.id === reward.fromUserId);
               const to = state.users.find((u) => u.id === reward.toUserId);
               return (
-                <div
-                  key={reward.id}
-                  className="border-border bg-background rounded-lg border p-4"
-                >
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground text-xs">
-                      {sos.category}
-                    </span>
-                    <span className="text-foreground text-xs font-medium tabular-nums">
-                      +{reward.points} {labelReward(reward.type)}
-                    </span>
-                  </div>
-                  <h3 className="text-foreground mt-2 text-sm font-medium leading-snug">
-                    {to?.name} → {sos.title}
-                  </h3>
-                  <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
-                    “{reward.kudosMessage}”
-                  </p>
-                  <p className="text-muted-foreground mt-2 text-[11px]">
-                    — {from?.name}
-                  </p>
-                </div>
+                <Card key={reward.id}>
+                  <CardContent className="p-5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-muted-foreground text-xs">
+                        {sos.category}
+                      </span>
+                      <span className="text-foreground text-xs font-medium tabular-nums">
+                        +{reward.points} {labelReward(reward.type)}
+                      </span>
+                    </div>
+                    <h3 className="text-foreground mt-2 text-sm font-medium leading-snug">
+                      {to?.name} → {sos.title}
+                    </h3>
+                    <p className="text-muted-foreground mt-2 text-xs leading-relaxed">
+                      “{reward.kudosMessage}”
+                    </p>
+                    <p className="text-muted-foreground mt-2 text-[11px]">
+                      — {from?.name}
+                    </p>
+                  </CardContent>
+                </Card>
               );
             })
           )}
