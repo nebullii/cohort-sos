@@ -27,6 +27,13 @@ export function ShortcutListener() {
       if (mod && e.key.toLowerCase() === "n" && !isTypingInField(e.target)) {
         e.preventDefault();
         emitShortcut("new-sos");
+        return;
+      }
+
+      // ? — show help / cheatsheet
+      if (e.key === "?" && !isTypingInField(e.target)) {
+        e.preventDefault();
+        emitShortcut("show-help");
       }
     }
     window.addEventListener("keydown", onKey);

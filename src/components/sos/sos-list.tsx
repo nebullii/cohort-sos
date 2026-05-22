@@ -26,12 +26,17 @@ const URGENCY_RANK: Record<string, number> = {
   Low: 3,
 };
 
+type Scope = "All" | "Mine" | "Helping" | "Open";
+
 interface Filters {
   search: string;
   category: string;
   urgency: string;
   status: string;
+  scope?: Scope;
 }
+
+const SCOPES: Scope[] = ["All", "Open", "Mine", "Helping"];
 
 interface SosListProps {
   filters: Filters;
@@ -53,6 +58,8 @@ export function SosList({ filters, setFilters, selectedId, onSelect }: SosListPr
     [],
   );
 
+  const scope: Scope = filters.scope ?? "All";
+
   const filtered = state.sosRequests
     .filter((sos) => {
       const haystack =
@@ -65,7 +72,21 @@ export function SosList({ filters, setFilters, selectedId, onSelect }: SosListPr
         filters.urgency === "All" || sos.urgency === filters.urgency;
       const matchesStatus =
         filters.status === "All" || sos.status === filters.status;
-      return matchesSearch && matchesCategory && matchesUrgency && matchesStatus;
+      const matchesScope =
+        scope === "All"
+          ? true
+          : scope === "Mine"
+            ? sos.requesterId === state.currentUserId
+            : scope === "Helping"
+              ? sos.helperIds.includes(state.currentUserId)
+              : sos.status !== "resolved";
+      return (
+        matchesSearch &&
+        matchesCategory &&
+        matchesUrgency &&
+        matchesStatus &&
+        matchesScope
+      );
     })
     .sort((a, b) => {
       if (a.status === "resolved" && b.status !== "resolved") return 1;
@@ -86,6 +107,32 @@ export function SosList({ filters, setFilters, selectedId, onSelect }: SosListPr
         <span className="text-muted-foreground text-xs tabular-nums">
           {activeCount} active · {resolvedCount} solved
         </span>
+      </div>
+
+      <div className="border-border flex border-b px-3 pt-2.5">
+        {SCOPES.map((s) => {
+          const active = scope === s;
+          return (
+            <button
+              key={s}
+              type="button"
+              onClick={() =>
+                setFilters((prev) => ({ ...prev, scope: s }))
+              }
+              className={cn(
+                "relative px-2.5 py-1.5 text-xs font-medium transition-colors",
+                active
+                  ? "text-foreground"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {s}
+              {active ? (
+                <span className="bg-foreground absolute inset-x-2 -bottom-px h-px" />
+              ) : null}
+            </button>
+          );
+        })}
       </div>
 
       <div className="border-border space-y-2 border-b px-3 py-3">
@@ -210,7 +257,7 @@ function SosListItem({ sos, active, onSelect }: SosListItemProps) {
         <span className="bg-foreground absolute left-0 top-0 h-full w-0.5" />
       ) : null}
       <div className="flex items-center gap-2">
-        <Dot tone={urgencyTone(sos.urgency)} />
+        <Dot tone={urgencyTone(sos.urgency)} label={`Urgency: ${sos.urgency}`} />
         <h3 className="text-foreground line-clamp-1 flex-1 text-sm font-medium">
           {sos.title}
         </h3>

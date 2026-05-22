@@ -11,6 +11,7 @@ import { UserAvatar } from "./user-avatar";
 import { Pill, UrgencyPill, StatusPill } from "./pills";
 import { ResolveDialog } from "./resolve-dialog";
 import { DeadlineCountdown } from "./deadline-countdown";
+import { MessageBody } from "./message-body";
 import { timeAgo } from "@/lib/format";
 
 interface ConversationProps {
@@ -245,9 +246,13 @@ function MessageRow({ author, createdAt, user, children }: MessageRowProps) {
             {timeAgo(createdAt)}
           </span>
         </div>
-        <p className="text-foreground mt-1 text-sm leading-relaxed">
-          {children}
-        </p>
+        <div className="text-foreground mt-1 text-sm leading-relaxed">
+          {typeof children === "string" ? (
+            <MessageBody body={children} />
+          ) : (
+            children
+          )}
+        </div>
       </div>
     </article>
   );

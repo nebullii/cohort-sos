@@ -35,9 +35,10 @@ export function Pill({ tone = "neutral", className, children }: PillProps) {
 interface DotProps {
   tone: Tone;
   className?: string;
+  label?: string;
 }
 
-export function Dot({ tone, className }: DotProps) {
+export function Dot({ tone, className, label }: DotProps) {
   const colors: Record<Tone, string> = {
     red: "bg-red-500",
     amber: "bg-amber-500",
@@ -48,6 +49,8 @@ export function Dot({ tone, className }: DotProps) {
   return (
     <span
       className={cn("inline-block size-1.5 rounded-full", colors[tone], className)}
+      role={label ? "img" : undefined}
+      aria-label={label}
     />
   );
 }

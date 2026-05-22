@@ -1,4 +1,4 @@
-type ShortcutEvent = "new-sos" | "focus-search";
+type ShortcutEvent = "new-sos" | "focus-search" | "show-help";
 
 type Listener = () => void;
 

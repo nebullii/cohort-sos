@@ -6,6 +6,7 @@ import { SosList } from "@/components/sos/sos-list";
 import { Conversation } from "@/components/sos/conversation";
 import { ContextPanel } from "@/components/sos/context-panel";
 import { CohortPulse } from "@/components/sos/cohort-pulse";
+import { OnboardingBanner } from "@/components/sos/onboarding-banner";
 import { useStore } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
@@ -65,6 +66,7 @@ export function BoardClient({ initialId }: BoardClientProps) {
 
   return (
     <>
+    <OnboardingBanner />
     <CohortPulse />
     <div className="bg-background border-border grid h-[calc(100vh-11rem)] grid-cols-1 overflow-hidden rounded-lg border md:grid-cols-[320px_minmax(0,1fr)] lg:grid-cols-[320px_minmax(0,1fr)_300px]">
       <div className={cn("min-h-0", showDetailOnMobile ? "hidden md:block" : "block")}>

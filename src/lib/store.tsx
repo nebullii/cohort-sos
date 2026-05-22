@@ -9,6 +9,7 @@ import {
   useState,
 } from "react";
 import { createSeed } from "./seed";
+import { pushToast } from "./toast";
 import { REWARD_POINTS } from "./types";
 import type {
   Cohort,
@@ -155,9 +156,12 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const resolveSos = useCallback<StoreApi["resolveSos"]>((input) => {
+    let resolvedTitle: string | null = null;
+    let totalPoints = 0;
     setState((prev) => {
       const sos = prev.sosRequests.find((item) => item.id === input.sosId);
       if (!sos) return prev;
+      resolvedTitle = sos.title;
       const now = new Date().toISOString();
       const helperIds = Array.from(
         new Set([...sos.helperIds, ...input.helpers.map((h) => h.userId)]),
@@ -179,6 +183,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           (pointsByUser.get(r.toUserId) ?? 0) + r.points,
         );
       });
+      totalPoints = Array.from(pointsByUser.values()).reduce(
+        (a, b) => a + b,
+        0,
+      );
       return {
         ...prev,
         users: prev.users.map((user) => {
@@ -200,6 +208,15 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         ),
       };
     });
+    if (resolvedTitle) {
+      pushToast({
+        title: "SOS resolved",
+        description: `“${resolvedTitle}” saved to the Knowledge Base${
+          totalPoints ? ` · +${totalPoints} rep awarded` : ""
+        }`,
+        tone: "success",
+      });
+    }
   }, []);
 
   const updateProfile = useCallback<StoreApi["updateProfile"]>((input) => {

@@ -9,6 +9,7 @@ import { useStore } from "@/lib/store";
 import { useTheme } from "@/lib/theme";
 import { LaunchDialog } from "@/components/sos/launch-dialog";
 import { ProfileDialog } from "@/components/sos/profile-dialog";
+import { NotificationsBell } from "@/components/sos/notifications-bell";
 import { UserAvatar } from "@/components/sos/user-avatar";
 import { onShortcut } from "@/lib/shortcut-bus";
 import { cn } from "@/lib/utils";
@@ -80,6 +81,7 @@ export function Topbar() {
               <Moon className="size-4" />
             )}
           </Button>
+          <NotificationsBell />
           <Button variant="ghost" size="sm" onClick={reset}>
             Reset
           </Button>
