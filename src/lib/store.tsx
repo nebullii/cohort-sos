@@ -27,6 +27,7 @@ interface LaunchInput {
   category: SosRequest["category"];
   urgency: Urgency;
   timeNeededMinutes: number;
+  deadlineAt?: string;
   repoUrl: string;
   liveUrl: string;
   context: string;
@@ -99,6 +100,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       repoUrl: input.repoUrl.trim(),
       liveUrl: input.liveUrl.trim(),
       timeNeededMinutes: input.timeNeededMinutes,
+      deadlineAt: input.deadlineAt || undefined,
       createdAt: new Date().toISOString(),
       comments: [],
       rewards: [],

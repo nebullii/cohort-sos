@@ -5,10 +5,12 @@ import { ArrowLeft, CheckCircle2, ExternalLink, Link as LinkIcon, Send } from "l
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
+import { broadcastTyping, useTypingIndicator } from "@/lib/presence";
 import type { SosRequest } from "@/lib/types";
 import { UserAvatar } from "./user-avatar";
 import { Pill, UrgencyPill, StatusPill } from "./pills";
 import { ResolveDialog } from "./resolve-dialog";
+import { DeadlineCountdown } from "./deadline-countdown";
 import { timeAgo } from "@/lib/format";
 
 interface ConversationProps {
@@ -36,6 +38,10 @@ export function Conversation({ sos, onBack }: ConversationProps) {
   const isRequester = sos.requesterId === state.currentUserId;
   const resolved = sos.status === "resolved";
   const [copied, setCopied] = useState(false);
+  const typingUserIds = useTypingIndicator(sos?.id ?? null, state.currentUserId);
+  const typingUsers = Array.from(typingUserIds)
+    .map((id) => state.users.find((u) => u.id === id))
+    .filter((u): u is NonNullable<typeof u> => Boolean(u));
 
   async function handleShare() {
     if (!sos) return;
@@ -110,6 +116,9 @@ export function Conversation({ sos, onBack }: ConversationProps) {
           <UrgencyPill urgency={sos.urgency} />
           <Pill>{sos.category}</Pill>
           <StatusPill status={sos.status} />
+          {sos.deadlineAt && !resolved ? (
+            <DeadlineCountdown deadlineAt={sos.deadlineAt} />
+          ) : null}
           <span className="text-muted-foreground ml-1 text-xs">
             · {sos.timeNeededMinutes} min
           </span>
@@ -138,6 +147,18 @@ export function Conversation({ sos, onBack }: ConversationProps) {
             </MessageRow>
           );
         })}
+
+        {typingUsers.length > 0 && !resolved ? (
+          <div className="text-muted-foreground ml-11 flex items-center gap-1.5 text-xs">
+            <span className="flex gap-0.5">
+              <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.3s]" />
+              <span className="size-1.5 animate-bounce rounded-full bg-current [animation-delay:-0.15s]" />
+              <span className="size-1.5 animate-bounce rounded-full bg-current" />
+            </span>
+            {typingUsers[0].name}
+            {typingUsers.length > 1 ? ` +${typingUsers.length - 1}` : ""} typing
+          </div>
+        ) : null}
 
         {sos.fixNote ? (
           <div className="ml-11 max-w-3xl">
@@ -169,7 +190,10 @@ export function Conversation({ sos, onBack }: ConversationProps) {
         <footer className="bg-background border-border grid grid-cols-[1fr_auto] items-end gap-2 border-t px-4 py-3">
           <Textarea
             value={draft}
-            onChange={(e) => setDraft(e.target.value)}
+            onChange={(e) => {
+              setDraft(e.target.value);
+              if (sos) broadcastTyping(sos.id, state.currentUserId);
+            }}
             placeholder="Reply with a clue, question, or next step"
             className="min-h-[60px] resize-y bg-background text-sm"
             onKeyDown={(e) => {

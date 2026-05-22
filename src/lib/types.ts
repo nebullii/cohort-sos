@@ -78,6 +78,7 @@ export interface SosRequest {
   repoUrl: string;
   liveUrl: string;
   timeNeededMinutes: number;
+  deadlineAt?: string;
   createdAt: string;
   resolvedAt?: string;
   fixNote?: string;

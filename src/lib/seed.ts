@@ -110,6 +110,7 @@ export function createSeed(): CohortState {
         repoUrl: "https://github.com/mayabuilds/cohort-auth",
         liveUrl: "https://cohort-auth.vercel.app",
         timeNeededMinutes: 15,
+        deadlineAt: new Date(Date.now() + 27 * 60 * 1000).toISOString(),
         createdAt: minutesAgo(12),
         comments: [
           comment(

@@ -94,6 +94,7 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
   const [category, setCategory] = useState<Category>("Deploy");
   const [urgency, setUrgency] = useState<Urgency>("High");
   const [timeNeededMinutes, setTimeNeededMinutes] = useState(15);
+  const [deadlineAt, setDeadlineAt] = useState("");
   const [repoUrl, setRepoUrl] = useState("");
   const [liveUrl, setLiveUrl] = useState("");
   const [context, setContext] = useState("");
@@ -103,6 +104,7 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
     setCategory("Deploy");
     setUrgency("High");
     setTimeNeededMinutes(15);
+    setDeadlineAt("");
     setRepoUrl("");
     setLiveUrl("");
     setContext("");
@@ -120,6 +122,7 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
       category,
       urgency,
       timeNeededMinutes,
+      deadlineAt: deadlineAt ? new Date(deadlineAt).toISOString() : undefined,
       repoUrl,
       liveUrl,
       context,
@@ -209,6 +212,21 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
                 </SelectContent>
               </Select>
             </div>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label htmlFor="sos-deadline">
+              Hard deadline
+              <span className="text-muted-foreground ml-1.5 text-xs font-normal">
+                (optional — when you must ship)
+              </span>
+            </Label>
+            <Input
+              id="sos-deadline"
+              type="datetime-local"
+              value={deadlineAt}
+              onChange={(e) => setDeadlineAt(e.target.value)}
+            />
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
