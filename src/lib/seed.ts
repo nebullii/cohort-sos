@@ -41,6 +41,11 @@ function reward(
 export function createSeed(): CohortState {
   return {
     currentUserId: "u1",
+    cohort: {
+      name: "Cohort 26",
+      motto: "Ship together, get unblocked together.",
+      startedAt: hoursAgo(24 * 14),
+    },
     users: [
       {
         id: "u1",

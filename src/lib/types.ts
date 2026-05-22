@@ -86,8 +86,15 @@ export interface SosRequest {
   rewards: Reward[];
 }
 
+export interface Cohort {
+  name: string;
+  motto: string;
+  startedAt: string;
+}
+
 export interface CohortState {
   currentUserId: string;
+  cohort: Cohort;
   users: User[];
   sosRequests: SosRequest[];
 }

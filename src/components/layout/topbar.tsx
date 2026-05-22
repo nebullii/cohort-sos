@@ -8,6 +8,8 @@ import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
 import { useTheme } from "@/lib/theme";
 import { LaunchDialog } from "@/components/sos/launch-dialog";
+import { ProfileDialog } from "@/components/sos/profile-dialog";
+import { UserAvatar } from "@/components/sos/user-avatar";
 import { onShortcut } from "@/lib/shortcut-bus";
 import { cn } from "@/lib/utils";
 
@@ -18,10 +20,13 @@ const NAV = [
 ] as const;
 
 export function Topbar() {
-  const { reset } = useStore();
+  const { state, reset } = useStore();
   const { theme, toggle } = useTheme();
   const pathname = usePathname();
   const [launchOpen, setLaunchOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
+
+  const me = state.users.find((u) => u.id === state.currentUserId);
 
   useEffect(() => onShortcut("new-sos", () => setLaunchOpen(true)), []);
 
@@ -35,6 +40,9 @@ export function Topbar() {
           <span className="bg-foreground size-2 rounded-full" />
           Cohort SOS
         </Link>
+        <span className="border-border text-muted-foreground hidden h-5 items-center rounded-md border px-1.5 text-[11px] sm:inline-flex">
+          {state.cohort.name}
+        </span>
 
         <nav className="flex items-center gap-1">
           {NAV.map((item) => {
@@ -81,10 +89,21 @@ export function Topbar() {
               ⌘N
             </kbd>
           </Button>
+          {me ? (
+            <button
+              type="button"
+              onClick={() => setProfileOpen(true)}
+              className="ml-1 rounded-full ring-offset-background outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+              aria-label="Edit profile"
+            >
+              <UserAvatar user={me} className="size-7" />
+            </button>
+          ) : null}
         </div>
       </div>
 
       <LaunchDialog open={launchOpen} onOpenChange={setLaunchOpen} />
+      <ProfileDialog open={profileOpen} onOpenChange={setProfileOpen} />
     </header>
   );
 }

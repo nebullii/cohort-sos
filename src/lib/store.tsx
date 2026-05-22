@@ -11,11 +11,13 @@ import {
 import { createSeed } from "./seed";
 import { REWARD_POINTS } from "./types";
 import type {
+  Cohort,
   CohortState,
   RewardType,
   SosRequest,
   Status,
   Urgency,
+  User,
 } from "./types";
 
 const STORAGE_KEY = "cohortSosState";
@@ -45,6 +47,8 @@ interface StoreApi {
   claimSos: (sosId: string) => void;
   addComment: (sosId: string, body: string) => void;
   resolveSos: (input: ResolveInput) => void;
+  updateProfile: (input: Partial<Pick<User, "name" | "githubHandle" | "skills">>) => void;
+  updateCohort: (input: Partial<Cohort>) => void;
   reset: () => void;
 }
 
@@ -196,6 +200,19 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     });
   }, []);
 
+  const updateProfile = useCallback<StoreApi["updateProfile"]>((input) => {
+    setState((prev) => ({
+      ...prev,
+      users: prev.users.map((u) =>
+        u.id === prev.currentUserId ? { ...u, ...input } : u,
+      ),
+    }));
+  }, []);
+
+  const updateCohort = useCallback<StoreApi["updateCohort"]>((input) => {
+    setState((prev) => ({ ...prev, cohort: { ...prev.cohort, ...input } }));
+  }, []);
+
   const reset = useCallback(() => {
     try {
       localStorage.removeItem(STORAGE_KEY);
@@ -206,8 +223,28 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const value = useMemo<StoreApi>(
-    () => ({ state, hydrated, launchSos, claimSos, addComment, resolveSos, reset }),
-    [state, hydrated, launchSos, claimSos, addComment, resolveSos, reset],
+    () => ({
+      state,
+      hydrated,
+      launchSos,
+      claimSos,
+      addComment,
+      resolveSos,
+      updateProfile,
+      updateCohort,
+      reset,
+    }),
+    [
+      state,
+      hydrated,
+      launchSos,
+      claimSos,
+      addComment,
+      resolveSos,
+      updateProfile,
+      updateCohort,
+      reset,
+    ],
   );
 
   return <StoreContext.Provider value={value}>{children}</StoreContext.Provider>;

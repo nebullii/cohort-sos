@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, CheckCircle2, ExternalLink, Send } from "lucide-react";
+import { ArrowLeft, CheckCircle2, ExternalLink, Link as LinkIcon, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { useStore } from "@/lib/store";
@@ -35,6 +35,19 @@ export function Conversation({ sos, onBack }: ConversationProps) {
   const isHelping = sos.helperIds.includes(state.currentUserId);
   const isRequester = sos.requesterId === state.currentUserId;
   const resolved = sos.status === "resolved";
+  const [copied, setCopied] = useState(false);
+
+  async function handleShare() {
+    if (!sos) return;
+    const url = `${window.location.origin}/board/${sos.id}`;
+    try {
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* ignore */
+    }
+  }
 
   function handleSend() {
     if (!sos) return;
@@ -66,21 +79,32 @@ export function Conversation({ sos, onBack }: ConversationProps) {
               {requester?.name ?? "Unknown"} · {timeAgo(sos.createdAt)}
             </p>
           </div>
-          {!resolved ? (
-            <div className="flex shrink-0 items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                disabled={isHelping || isRequester}
-                onClick={() => claimSos(sos.id)}
-              >
-                {isHelping ? "Helping" : isRequester ? "Your SOS" : "Claim"}
-              </Button>
-              <Button size="sm" onClick={() => setResolveOpen(true)}>
-                Resolve
-              </Button>
-            </div>
-          ) : null}
+          <div className="flex shrink-0 items-center gap-2">
+            <Button
+              variant="ghost"
+              size="icon-sm"
+              onClick={handleShare}
+              aria-label="Copy share link"
+              title={copied ? "Link copied" : "Copy share link"}
+            >
+              <LinkIcon className="size-3.5" />
+            </Button>
+            {!resolved ? (
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  disabled={isHelping || isRequester}
+                  onClick={() => claimSos(sos.id)}
+                >
+                  {isHelping ? "Helping" : isRequester ? "Your SOS" : "Claim"}
+                </Button>
+                <Button size="sm" onClick={() => setResolveOpen(true)}>
+                  Resolve
+                </Button>
+              </>
+            ) : null}
+          </div>
         </div>
         <div className="mt-3 flex flex-wrap items-center gap-1.5">
           <UrgencyPill urgency={sos.urgency} />
