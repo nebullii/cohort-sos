@@ -3,20 +3,23 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { Moon, Sun } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useStore } from "@/lib/store";
+import { useTheme } from "@/lib/theme";
 import { LaunchDialog } from "@/components/sos/launch-dialog";
 import { onShortcut } from "@/lib/shortcut-bus";
 import { cn } from "@/lib/utils";
 
 const NAV = [
-  { href: "/", label: "Help" },
+  { href: "/board", label: "Help" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/knowledge", label: "Knowledge" },
 ] as const;
 
 export function Topbar() {
   const { reset } = useStore();
+  const { theme, toggle } = useTheme();
   const pathname = usePathname();
   const [launchOpen, setLaunchOpen] = useState(false);
 
@@ -56,7 +59,19 @@ export function Topbar() {
           })}
         </nav>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto flex items-center gap-1">
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            onClick={toggle}
+            aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+          >
+            {theme === "dark" ? (
+              <Sun className="size-4" />
+            ) : (
+              <Moon className="size-4" />
+            )}
+          </Button>
           <Button variant="ghost" size="sm" onClick={reset}>
             Reset
           </Button>
