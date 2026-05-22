@@ -1,0 +1,186 @@
+"use client";
+
+import { useState } from "react";
+import { CheckCircle2, ExternalLink, Send } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useStore } from "@/lib/store";
+import type { SosRequest } from "@/lib/types";
+import { UserAvatar } from "./user-avatar";
+import { Pill, UrgencyPill, StatusPill } from "./pills";
+import { ResolveDialog } from "./resolve-dialog";
+import { timeAgo } from "@/lib/format";
+
+interface ConversationProps {
+  sos: SosRequest | null;
+}
+
+export function Conversation({ sos }: ConversationProps) {
+  const { state, claimSos, addComment } = useStore();
+  const [draft, setDraft] = useState("");
+  const [resolveOpen, setResolveOpen] = useState(false);
+
+  if (!sos) {
+    return (
+      <section className="bg-background flex h-full items-center justify-center">
+        <div className="text-muted-foreground text-center text-sm">
+          <p>Select a request to view the conversation.</p>
+        </div>
+      </section>
+    );
+  }
+
+  const requester = state.users.find((u) => u.id === sos.requesterId);
+  const isHelping = sos.helperIds.includes(state.currentUserId);
+  const isRequester = sos.requesterId === state.currentUserId;
+  const resolved = sos.status === "resolved";
+
+  function handleSend() {
+    if (!sos) return;
+    const body = draft.trim();
+    if (!body) return;
+    addComment(sos.id, body);
+    setDraft("");
+  }
+
+  return (
+    <section className="bg-background grid h-full min-h-0 grid-rows-[auto_1fr_auto]">
+      <header className="border-border border-b px-6 py-5">
+        <div className="flex items-start justify-between gap-4">
+          <div className="min-w-0">
+            <h2 className="text-foreground text-lg font-semibold leading-tight">
+              {sos.title}
+            </h2>
+            <p className="text-muted-foreground mt-1 text-xs">
+              {requester?.name ?? "Unknown"} · {timeAgo(sos.createdAt)}
+            </p>
+          </div>
+          {!resolved ? (
+            <div className="flex shrink-0 items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={isHelping || isRequester}
+                onClick={() => claimSos(sos.id)}
+              >
+                {isHelping ? "Helping" : isRequester ? "Your SOS" : "Claim"}
+              </Button>
+              <Button size="sm" onClick={() => setResolveOpen(true)}>
+                Resolve
+              </Button>
+            </div>
+          ) : null}
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-1.5">
+          <UrgencyPill urgency={sos.urgency} />
+          <Pill>{sos.category}</Pill>
+          <StatusPill status={sos.status} />
+          <span className="text-muted-foreground ml-1 text-xs">
+            · {sos.timeNeededMinutes} min
+          </span>
+        </div>
+      </header>
+
+      <div className="min-h-0 space-y-5 overflow-y-auto px-6 py-5">
+        <MessageRow
+          author={requester?.name ?? "Unknown"}
+          createdAt={sos.createdAt}
+          user={requester ?? null}
+        >
+          {sos.context}
+        </MessageRow>
+
+        {sos.comments.map((comment) => {
+          const user = state.users.find((u) => u.id === comment.userId);
+          return (
+            <MessageRow
+              key={comment.id}
+              author={user?.name ?? "Unknown"}
+              createdAt={comment.createdAt}
+              user={user ?? null}
+            >
+              {comment.body}
+            </MessageRow>
+          );
+        })}
+
+        {sos.fixNote ? (
+          <div className="ml-11 max-w-3xl">
+            <div className="border-border bg-muted/30 rounded-lg border p-4">
+              <div className="text-muted-foreground flex items-center gap-1.5 text-[11px] font-medium uppercase tracking-wide">
+                <CheckCircle2 className="size-3.5" />
+                Final fix
+              </div>
+              <p className="text-foreground mt-2 text-sm leading-relaxed">
+                {sos.fixNote}
+              </p>
+            </div>
+          </div>
+        ) : null}
+      </div>
+
+      {!resolved ? (
+        <footer className="bg-background border-border grid grid-cols-[1fr_auto] items-end gap-2 border-t px-4 py-3">
+          <Textarea
+            value={draft}
+            onChange={(e) => setDraft(e.target.value)}
+            placeholder="Reply with a clue, question, or next step"
+            className="min-h-[60px] resize-y bg-background text-sm"
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && (e.metaKey || e.ctrlKey)) {
+                e.preventDefault();
+                handleSend();
+              }
+            }}
+          />
+          <Button onClick={handleSend} disabled={!draft.trim()}>
+            <Send className="size-4" />
+            Send
+          </Button>
+        </footer>
+      ) : (
+        <footer className="border-border text-muted-foreground border-t px-4 py-3 text-center text-xs">
+          Resolved {timeAgo(sos.resolvedAt ?? sos.createdAt)}.
+        </footer>
+      )}
+
+      <ResolveDialog
+        sos={sos}
+        open={resolveOpen}
+        onOpenChange={setResolveOpen}
+      />
+    </section>
+  );
+}
+
+interface MessageRowProps {
+  author: string;
+  createdAt: string;
+  user: { id: string; name: string; avatarUrl: string } | null;
+  children: React.ReactNode;
+}
+
+function MessageRow({ author, createdAt, user, children }: MessageRowProps) {
+  return (
+    <article className="grid grid-cols-[auto_1fr] gap-3">
+      {user ? (
+        <UserAvatar user={user as never} className="size-8 shrink-0" />
+      ) : (
+        <div className="bg-muted size-8 rounded-full" />
+      )}
+      <div className="min-w-0 max-w-3xl">
+        <div className="flex items-baseline gap-2">
+          <span className="text-foreground text-sm font-medium">{author}</span>
+          <span className="text-muted-foreground text-xs">
+            {timeAgo(createdAt)}
+          </span>
+        </div>
+        <p className="text-foreground mt-1 text-sm leading-relaxed">
+          {children}
+        </p>
+      </div>
+    </article>
+  );
+}
+
+export { ExternalLink };
