@@ -25,6 +25,7 @@ import {
 import { CATEGORIES, URGENCIES, type Category, type Urgency } from "@/lib/types";
 import { useStore } from "@/lib/store";
 import { AiSuggestions } from "./ai-suggestions";
+import { AiHelperMatch } from "./ai-helper-match";
 
 interface LaunchDialogProps {
   open: boolean;
@@ -392,6 +393,7 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
           </div>
 
           <AiSuggestions query={`${title}\n${context}`} />
+          <AiHelperMatch query={`${title}\n${context}`} category={category} />
 
           <DialogFooter>
             <Button

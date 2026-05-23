@@ -124,6 +124,12 @@ function MemberCard({ m, highlight }: { m: User; highlight?: boolean }) {
         ) : null}
       </div>
 
+      {m.loomUrl ? (
+        <div className="border-border bg-black mt-4 overflow-hidden rounded-md border">
+          <LoomEmbed url={m.loomUrl} />
+        </div>
+      ) : null}
+
       {m.pitch ? (
         <p className="text-muted-foreground mt-4 line-clamp-3 text-sm leading-relaxed">
           “{m.pitch}”
@@ -173,6 +179,35 @@ function Stat({
         </div>
         <div className="text-muted-foreground mt-1 text-[11px]">{label}</div>
       </div>
+    </div>
+  );
+}
+
+function LoomEmbed({ url }: { url: string }) {
+  // Loom share URLs look like https://www.loom.com/share/<id>; embed is
+  // https://www.loom.com/embed/<id>. Fall back to the raw link if we can't parse.
+  const match = url.match(/loom\.com\/(?:share|embed)\/([a-z0-9]+)/i);
+  if (!match) {
+    return (
+      <a
+        href={url}
+        target="_blank"
+        rel="noreferrer"
+        className="text-muted-foreground block p-3 text-xs"
+      >
+        Open Loom
+      </a>
+    );
+  }
+  return (
+    <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
+      <iframe
+        src={`https://www.loom.com/embed/${match[1]}?hideEmbedTopBar=true`}
+        allow="fullscreen"
+        loading="lazy"
+        title="Loom demo"
+        className="absolute inset-0 size-full"
+      />
     </div>
   );
 }

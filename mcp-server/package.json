@@ -1,0 +1,16 @@
+{
+  "name": "cohort-sos-mcp",
+  "version": "0.1.0",
+  "description": "Cursor MCP server for Cohort SOS. Launch an SOS from inside your editor.",
+  "type": "module",
+  "bin": {
+    "cohort-sos-mcp": "./server.mjs"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "license": "MIT"
+}
