@@ -39,22 +39,26 @@ export function AiSuggestions({ query }: AiSuggestionsProps) {
       const resolved = state.sosRequests.filter(
         (s) => s.status === "resolved" && s.fixNote,
       );
+      if (resolved.length === 0) {
+        if (!cancelled) setReady(true);
+        return;
+      }
       const fresh = new Map<string, Float32Array>();
-      for (const sos of resolved) {
-        if (cancelled) return;
-        const cached = indexRef.current.get(sos.id);
-        if (cached) {
-          fresh.set(sos.id, cached);
-          continue;
-        }
-        try {
+      try {
+        for (const sos of resolved) {
+          if (cancelled) return;
+          const cached = indexRef.current.get(sos.id);
+          if (cached) {
+            fresh.set(sos.id, cached);
+            continue;
+          }
           const vec = await embedText(
             `${sos.title}\n${sos.context}\n${sos.fixNote ?? ""}`,
           );
           fresh.set(sos.id, vec);
-        } catch {
-          /* skip */
         }
+      } catch {
+        /* model failed to load; leave suggestions empty */
       }
       if (!cancelled) {
         indexRef.current = fresh;

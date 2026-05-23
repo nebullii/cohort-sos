@@ -37,34 +37,34 @@ export function AiHelperMatch({ query, category }: AiHelperMatchProps) {
     let cancelled = false;
     async function build() {
       const fresh = new Map<string, Float32Array>();
-      for (const u of state.users) {
-        if (cancelled) return;
-        if (u.id === state.currentUserId) continue;
-        const cached = indexRef.current.get(u.id);
-        if (cached) {
-          fresh.set(u.id, cached);
-          continue;
-        }
-        const helpedCategories = state.sosRequests
-          .filter(
-            (s) => s.helperIds.includes(u.id) && s.status === "resolved",
-          )
-          .map((s) => s.category)
-          .join(", ");
-        const profile = [
-          `${u.name}`,
-          `Skills: ${u.skills.join(", ")}`,
-          helpedCategories ? `Has resolved: ${helpedCategories}` : "",
-          u.pitch ?? "",
-        ]
-          .filter(Boolean)
-          .join("\n");
-        try {
+      try {
+        for (const u of state.users) {
+          if (cancelled) return;
+          if (u.id === state.currentUserId) continue;
+          const cached = indexRef.current.get(u.id);
+          if (cached) {
+            fresh.set(u.id, cached);
+            continue;
+          }
+          const helpedCategories = state.sosRequests
+            .filter(
+              (s) => s.helperIds.includes(u.id) && s.status === "resolved",
+            )
+            .map((s) => s.category)
+            .join(", ");
+          const profile = [
+            `${u.name}`,
+            `Skills: ${u.skills.join(", ")}`,
+            helpedCategories ? `Has resolved: ${helpedCategories}` : "",
+            u.pitch ?? "",
+          ]
+            .filter(Boolean)
+            .join("\n");
           const vec = await embedText(profile);
           fresh.set(u.id, vec);
-        } catch {
-          /* skip */
         }
+      } catch {
+        /* model failed to load; leave matches empty */
       }
       if (!cancelled) {
         indexRef.current = fresh;
