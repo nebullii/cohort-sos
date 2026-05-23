@@ -13,7 +13,7 @@ export default function NotFound() {
           Lost in the cohort.
         </h1>
         <p className="text-muted-foreground mx-auto mt-2 max-w-md text-sm">
-          That page doesn&apos;t exist. Maybe it was never launched — or it&apos;s
+          That page doesn&apos;t exist. Maybe it was never launched, or it&apos;s
           already been resolved.
         </p>
         <div className="mt-6 flex items-center justify-center gap-2">

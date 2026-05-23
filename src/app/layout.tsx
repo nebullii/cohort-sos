@@ -13,11 +13,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Cohort SOS — Rescue network for Cursor Boston Summer 1",
+  title: "Cohort SOS · Rescue network for Cursor Boston Summer 1",
   description:
     "Built for Cursor Boston's Summer Cohort. Unblock stuck builders in minutes. Every fix becomes searchable cohort memory.",
   openGraph: {
-    title: "Cohort SOS — Cursor Boston Summer 1",
+    title: "Cohort SOS · Cursor Boston Summer 1",
     description:
       "Built for Cursor Boston's Summer Cohort. Unblock stuck builders in minutes.",
     type: "website",

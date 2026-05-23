@@ -32,7 +32,7 @@ export function parseError(input: string): ParsedError {
 
   const result: ParsedError = {};
 
-  // Title — first error-shaped line, otherwise first 80 chars.
+  // Title: first error-shaped line, otherwise first 80 chars.
   const errorMatch = ERROR_LINE_RE.exec(text);
   if (errorMatch) {
     result.title = errorMatch[1].trim().slice(0, 90);
@@ -41,7 +41,7 @@ export function parseError(input: string): ParsedError {
     if (firstLine) result.title = firstLine.trim().slice(0, 90);
   }
 
-  // Category — first matching hint.
+  // Category: first matching hint.
   for (const { re, category } of CATEGORY_HINTS) {
     if (re.test(text)) {
       result.category = category;
@@ -49,12 +49,12 @@ export function parseError(input: string): ParsedError {
     }
   }
 
-  // Urgency — bump if it looks like a deploy/auth blocker or stack trace.
+  // Urgency: bump if it looks like a deploy/auth blocker or stack trace.
   if (HTTP_STATUS_RE.test(text) || STACK_TRACE_RE.test(text)) {
     result.urgency = "High";
   }
 
-  // Context — restructured template.
+  // Context: restructured template.
   const fileMatch = FILE_LINE_RE.exec(text);
   const fileLine = fileMatch
     ? `${fileMatch[1]}${fileMatch[2] ? `:${fileMatch[2]}` : ""}${

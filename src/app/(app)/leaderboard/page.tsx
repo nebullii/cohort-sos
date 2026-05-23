@@ -141,7 +141,7 @@ export default function LeaderboardPage() {
           Leaderboard
         </h1>
         <p className="text-muted-foreground mt-2 text-sm">
-          Rescue Rep is earned from resolved SOS requests — unblocking,
+          Rescue Rep is earned from resolved SOS requests: unblocking,
           diagnosing, testing, fix notes, and fast response.
         </p>
       </header>
@@ -272,7 +272,7 @@ export default function LeaderboardPage() {
                       “{reward.kudosMessage}”
                     </p>
                     <p className="text-muted-foreground mt-2 text-[11px]">
-                      — {from?.name}
+                      {from?.name}
                     </p>
                   </CardContent>
                 </Card>

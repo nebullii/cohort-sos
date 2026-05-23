@@ -60,7 +60,7 @@ export default function LandingPage() {
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
             <Link href="/board" className={buttonVariants({ size: "lg" })}>
-              Try it — no signup <ArrowRight className="size-4" />
+              Try it, no signup <ArrowRight className="size-4" />
             </Link>
             <Link
               href="/knowledge"
@@ -170,7 +170,7 @@ export default function LandingPage() {
                       <code className="bg-muted mx-1 rounded px-1 py-0.5 text-[10px]">
                         await req.json()
                       </code>
-                      — it consumes the stream.
+                      , it consumes the stream.
                     </p>
                   </div>
                 </div>
@@ -211,7 +211,7 @@ export default function LandingPage() {
               How it works
             </h2>
             <p className="text-muted-foreground mt-2 text-sm">
-              Four steps. Every rescue triples in value — requester ships,
+              Four steps. Every rescue triples in value: requester ships,
               helper earns rep, cohort gets a permanent fix.
             </p>
           </div>
@@ -287,7 +287,7 @@ export default function LandingPage() {
                 “{q}”
               </blockquote>
               <figcaption className="text-muted-foreground mt-3 text-xs">
-                — {w}
+                {w}
               </figcaption>
             </figure>
           ))}
@@ -321,7 +321,7 @@ export default function LandingPage() {
       <footer className="border-border border-t">
         <div className="mx-auto flex w-full max-w-[1200px] flex-col items-center justify-between gap-3 px-4 py-6 text-xs md:flex-row md:px-6">
           <span className="text-muted-foreground">
-            © {new Date().getFullYear()} Cohort SOS — built for builders who
+            © {new Date().getFullYear()} Cohort SOS. Built for builders who
             help each other.
           </span>
           <div className="text-muted-foreground flex items-center gap-4">

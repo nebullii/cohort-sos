@@ -147,7 +147,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         },
       )
       .catch(() => {
-        /* offline / 502 — keep seed roster */
+        /* offline / 502: keep seed roster */
       });
   }, []);
 

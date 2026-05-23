@@ -34,7 +34,7 @@ export function ContextPanel({ sos }: ContextPanelProps) {
   return (
     <aside className="bg-background border-border hidden h-full min-h-0 overflow-y-auto border-l lg:block">
       <Section title="Details">
-        <DetailRow label="Requester" value={requester?.name ?? "—"} />
+        <DetailRow label="Requester" value={requester?.name ?? "·"} />
         <DetailRow label="Time" value={`${sos.timeNeededMinutes} min`} />
         <DetailRow
           label="Repo"
@@ -44,7 +44,7 @@ export function ContextPanel({ sos }: ContextPanelProps) {
                 {sos.repoUrl.replace(/^https?:\/\//, "")}
               </ExternalAnchor>
             ) : (
-              <span className="text-muted-foreground">—</span>
+              <span className="text-muted-foreground">·</span>
             )
           }
         />
@@ -56,7 +56,7 @@ export function ContextPanel({ sos }: ContextPanelProps) {
                 {sos.liveUrl.replace(/^https?:\/\//, "")}
               </ExternalAnchor>
             ) : (
-              <span className="text-muted-foreground">—</span>
+              <span className="text-muted-foreground">·</span>
             )
           }
         />

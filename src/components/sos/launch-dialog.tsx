@@ -140,7 +140,7 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
           [
             data.body,
             "",
-            "—",
+            "·",
             `Imported from GitHub issue #${data.number} by @${data.author}`,
           ]
             .filter(Boolean)
@@ -320,7 +320,7 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
             <Label htmlFor="sos-deadline">
               Hard deadline
               <span className="text-muted-foreground ml-1.5 text-xs font-normal">
-                (optional — when you must ship)
+                (optional: when you must ship)
               </span>
             </Label>
             <Input

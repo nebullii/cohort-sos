@@ -118,7 +118,7 @@ export function ResolveDialog({ sos, open, onOpenChange }: ResolveDialogProps) {
             <Label htmlFor="fix-commit">
               Proof of fix
               <span className="text-muted-foreground ml-1.5 text-xs font-normal">
-                (optional — commit, PR, or screenshot URL)
+                (optional: commit, PR, or screenshot URL)
               </span>
             </Label>
             <Input

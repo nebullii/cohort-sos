@@ -103,7 +103,7 @@ export function CohortPulse() {
         <Stat
           icon={Clock}
           label="Avg time to resolve"
-          value={avgMinutesToResolve > 0 ? `${avgMinutesToResolve}m` : "—"}
+          value={avgMinutesToResolve > 0 ? `${avgMinutesToResolve}m` : "·"}
         />
       </div>
 

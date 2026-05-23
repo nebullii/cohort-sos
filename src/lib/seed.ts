@@ -174,7 +174,7 @@ export function createSeed(): CohortState {
       },
       {
         id: "s5",
-        title: "Prisma migrate failing on Neon — column already exists",
+        title: "Prisma migrate failing on Neon: column already exists",
         category: "Database",
         urgency: "High",
         status: "open",
@@ -208,7 +208,7 @@ export function createSeed(): CohortState {
       },
       {
         id: "s7",
-        title: "Demo video has 8s of dead air — need a tighter cut",
+        title: "Demo video has 8s of dead air, need a tighter cut",
         category: "Pitch",
         urgency: "Low",
         status: "resolved",

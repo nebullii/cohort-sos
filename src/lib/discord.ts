@@ -27,6 +27,6 @@ export function notifyDiscord(payload: DiscordPayload) {
     body: JSON.stringify(payload),
     keepalive: true,
   }).catch(() => {
-    /* swallow — never block the user flow */
+    /* swallow: never block the user flow */
   });
 }

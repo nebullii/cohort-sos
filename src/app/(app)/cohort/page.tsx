@@ -29,7 +29,7 @@ export default function CohortPage() {
         </h1>
         <p className="text-muted-foreground mt-2 text-sm">
           {members.length} builders shipping in public. Pulled live from the
-          Cursor Boston submissions repo — when a new member submits, they
+          Cursor Boston submissions repo. When a new member submits, they
           appear here automatically.
         </p>
       </header>

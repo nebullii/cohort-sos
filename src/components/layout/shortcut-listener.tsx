@@ -16,21 +16,21 @@ export function ShortcutListener() {
     function onKey(e: KeyboardEvent) {
       const mod = e.metaKey || e.ctrlKey;
 
-      // ⌘K — focus search (works anywhere)
+      // ⌘K: focus search (works anywhere)
       if (mod && e.key.toLowerCase() === "k") {
         e.preventDefault();
         emitShortcut("focus-search");
         return;
       }
 
-      // ⌘N — new SOS (skip if typing)
+      // ⌘N: new SOS (skip if typing)
       if (mod && e.key.toLowerCase() === "n" && !isTypingInField(e.target)) {
         e.preventDefault();
         emitShortcut("new-sos");
         return;
       }
 
-      // ? — show help / cheatsheet
+      // ?: show help / cheatsheet
       if (e.key === "?" && !isTypingInField(e.target)) {
         e.preventDefault();
         emitShortcut("show-help");
