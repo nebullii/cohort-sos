@@ -24,6 +24,7 @@ import {
 } from "@/components/ui/select";
 import { CATEGORIES, URGENCIES, type Category, type Urgency } from "@/lib/types";
 import { useStore } from "@/lib/store";
+import { AiSuggestions } from "./ai-suggestions";
 
 interface LaunchDialogProps {
   open: boolean;
@@ -389,6 +390,8 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
               placeholder="Paste an error or describe what's broken. We'll detect Cursor errors and auto-fill."
             />
           </div>
+
+          <AiSuggestions query={`${title}\n${context}`} />
 
           <DialogFooter>
             <Button
