@@ -8,10 +8,13 @@ import {
   Trophy,
 } from "lucide-react";
 import { useStore } from "@/lib/store";
+import { findCohort } from "@/lib/cohorts";
 import type { User } from "@/lib/types";
 
 export default function CohortPage() {
-  const { state } = useStore();
+  const { state, activeCohortSlug } = useStore();
+  const cohortConfig = findCohort(activeCohortSlug);
+  const currentWeek = cohortConfig?.currentSource;
   const byName = (a: { name: string }, b: { name: string }) =>
     a.name.localeCompare(b.name);
 
@@ -23,16 +26,23 @@ export default function CohortPage() {
   return (
     <div className="space-y-10">
       <header className="max-w-2xl">
-        <p className="text-muted-foreground text-xs font-medium">
-          {state.cohort?.name ?? "Cohort"}
-        </p>
+        <div className="flex flex-wrap items-center gap-2">
+          <p className="text-muted-foreground text-xs font-medium">
+            {state.cohort?.name ?? "Cohort"}
+          </p>
+          {currentWeek?.number ? (
+            <span className="border-border bg-muted text-foreground inline-flex items-center rounded-full border px-2 py-0.5 text-[10px] font-semibold">
+              Week {currentWeek.number}: {currentWeek.theme}
+            </span>
+          ) : null}
+        </div>
         <h1 className="text-foreground mt-1 text-2xl font-semibold tracking-tight">
           The Cohort
         </h1>
         <p className="text-muted-foreground mt-2 text-sm">
           {members.length} builders shipping in public. Pulled live from the
-          Cursor Boston submissions repo. When a new member submits, they
-          appear here automatically.
+          cohort submissions repo. When a new member submits, they appear here
+          automatically.
         </p>
       </header>
 
@@ -51,7 +61,12 @@ export default function CohortPage() {
           <div className="mb-3 flex items-center gap-2">
             <Trophy className="size-4 text-amber-600" />
             <h2 className="text-foreground text-sm font-semibold">
-              Competing for the win
+              Competing for the win{" "}
+              {currentWeek?.theme ? (
+                <span className="text-muted-foreground font-normal">
+                  · this week ({currentWeek.theme})
+                </span>
+              ) : null}
             </h2>
             <span className="text-muted-foreground text-xs">
               {competing.length} of {members.length}

@@ -51,7 +51,7 @@ export default function OnboardingPage() {
       motto,
       startedAt,
       endsAt,
-      source: {
+      rosterSource: {
         owner: sourceOwner,
         repo: sourceRepo,
         ref: sourceRef,
@@ -77,11 +77,11 @@ export default function OnboardingPage() {
   motto: "${config.motto}",
   startedAt: "${config.startedAt}",
   endsAt: "${config.endsAt}",
-  source: {
-    owner: "${config.source.owner}",
-    repo: "${config.source.repo}",
-    ref: "${config.source.ref}",
-    path: "${config.source.path}",
+  rosterSource: {
+    owner: "${config.rosterSource.owner}",
+    repo: "${config.rosterSource.repo}",
+    ref: "${config.rosterSource.ref}",
+    path: "${config.rosterSource.path}",
   },
 },`;
 

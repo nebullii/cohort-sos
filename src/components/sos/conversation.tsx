@@ -12,6 +12,7 @@ import { Pill, UrgencyPill, StatusPill } from "./pills";
 import { ResolveDialog } from "./resolve-dialog";
 import { DeadlineCountdown } from "./deadline-countdown";
 import { MessageBody } from "./message-body";
+import { SocialShare } from "./social-share";
 import { timeAgo } from "@/lib/format";
 
 interface ConversationProps {
@@ -231,6 +232,13 @@ export function Conversation({ sos, onBack }: ConversationProps) {
                 Open share card
               </a>
             </div>
+            <SocialShare
+              sos={sos}
+              helpers={sos.helperIds
+                .map((id) => state.users.find((u) => u.id === id))
+                .filter((u): u is NonNullable<typeof u> => Boolean(u))}
+              cohortName={state.cohort?.name ?? "Cohort SOS"}
+            />
           </div>
         ) : null}
       </div>

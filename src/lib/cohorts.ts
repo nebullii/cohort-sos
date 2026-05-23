@@ -1,17 +1,29 @@
 /**
  * Registry of cohorts running on Cohort SOS.
  *
- * Each cohort defines where its roster lives (a GitHub repo path with one
- * JSON submission file per member). When a new cohort wants to onboard,
- * they either:
+ * The Cursor Boston Summer cohorts are themed weekly: PM, Comms, Marketing,
+ * Education, Startup, OSS. Each cohort member submits a new project for
+ * each week. The branch where submissions live is per-week.
  *
- *   1. Open a PR adding an entry to BUILT_IN_COHORTS below, or
- *   2. Use the /onboarding wizard to spin up a draft locally and then ship
- *      the PR with one click.
- *
- * The schema is intentionally GitHub-native: cohort identity is keyed on a
- * public repo path so the data is portable, inspectable, and free to host.
+ * Cohort identity (the full roster) is derived from the broadest week,
+ * typically Week 1 (PM). The currently-active week tells us which project
+ * each member is shipping right now and who is competing for the win.
  */
+
+export interface CohortWeekSource {
+  /** GitHub owner / org. */
+  owner: string;
+  /** GitHub repo name. */
+  repo: string;
+  /** Branch / ref where this week's submissions live. */
+  ref: string;
+  /** Path inside the repo to the submissions folder. */
+  path: string;
+  /** Display number of the week, e.g. 2. */
+  number?: number;
+  /** Theme of this week, e.g. "Comms". */
+  theme?: string;
+}
 
 export interface CohortConfig {
   /** URL-safe slug. Used in routes and storage keys. */
@@ -22,18 +34,15 @@ export interface CohortConfig {
   motto: string;
   /** ISO date when the cohort started. */
   startedAt: string;
-  /** ISO date when the cohort ends. Used to mark active vs archived. */
+  /** ISO date when the cohort ends. */
   endsAt: string;
-  /** Where the roster lives: GitHub org/repo, branch, and submissions dir. */
-  source: {
-    owner: string;
-    repo: string;
-    ref: string;
-    path: string;
-  };
+  /** The widest source of cohort members. Used for the full roster. */
+  rosterSource: CohortWeekSource;
+  /** The active week. If set, used for current project links and `competeForWin`. */
+  currentSource?: CohortWeekSource;
   /** Optional Discord webhook env var name (resolved server-side). */
   discordWebhookEnv?: string;
-  /** Optional accent color hex (hero/landing tint). */
+  /** Optional accent color hex. */
   accentColor?: string;
 }
 
@@ -44,11 +53,21 @@ export const BUILT_IN_COHORTS: CohortConfig[] = [
     motto: "Ship together, get unblocked together.",
     startedAt: "2026-05-08",
     endsAt: "2026-06-19",
-    source: {
+    rosterSource: {
+      owner: "rogerSuperBuilderAlpha",
+      repo: "cursor-boston",
+      ref: "c1w1pm-submission",
+      path: "content/summer-cohort/c1/w1-pm/submissions",
+      number: 1,
+      theme: "PM",
+    },
+    currentSource: {
       owner: "rogerSuperBuilderAlpha",
       repo: "cursor-boston",
       ref: "c1w2comms-submission",
       path: "content/summer-cohort/c1/w2-comms/submissions",
+      number: 2,
+      theme: "Comms",
     },
     discordWebhookEnv: "DISCORD_WEBHOOK_URL",
     accentColor: "#f59e0b",
@@ -62,10 +81,9 @@ export function findCohort(slug: string | null | undefined): CohortConfig | null
   return BUILT_IN_COHORTS.find((c) => c.slug === slug) ?? null;
 }
 
-/**
- * Returns the cohort URL on this app, e.g. `/c/cursor-boston-summer-1/board`.
- * The plain `/board` is an alias for the default cohort, kept for back-compat.
- */
-export function cohortHref(slug: string, page: "board" | "cohort" | "leaderboard" | "knowledge" = "board"): string {
+export function cohortHref(
+  slug: string,
+  page: "board" | "cohort" | "leaderboard" | "knowledge" = "board",
+): string {
   return `/c/${slug}/${page}`;
 }

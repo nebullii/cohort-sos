@@ -20,8 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Sparkles, Loader2 } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { celebrateResolve } from "@/lib/celebrate";
+import { summarize } from "@/lib/ai-summarize";
 import {
   REWARD_POINTS,
   type RewardType,
@@ -48,6 +50,23 @@ export function ResolveDialog({ sos, open, onOpenChange }: ResolveDialogProps) {
   const [fixNote, setFixNote] = useState("");
   const [fixCommitUrl, setFixCommitUrl] = useState("");
   const [kudosMessage, setKudosMessage] = useState("");
+  const [drafting, setDrafting] = useState(false);
+
+  async function draftFixNote() {
+    setDrafting(true);
+    try {
+      const text = [
+        sos.context,
+        ...sos.comments.map((c) => c.body),
+      ]
+        .filter(Boolean)
+        .join(" ");
+      const summary = await summarize(text, 3);
+      if (summary) setFixNote(summary);
+    } finally {
+      setDrafting(false);
+    }
+  }
 
   const helperCandidates = useMemo(() => {
     const ids = new Set<string>([state.currentUserId, ...sos.helperIds]);
@@ -103,14 +122,29 @@ export function ResolveDialog({ sos, open, onOpenChange }: ResolveDialogProps) {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1.5">
-            <Label htmlFor="fix-note">Final fix note</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="fix-note">Final fix note</Label>
+              <button
+                type="button"
+                onClick={draftFixNote}
+                disabled={drafting || sos.comments.length === 0}
+                className="text-foreground hover:underline inline-flex items-center gap-1 text-xs font-medium disabled:opacity-50"
+              >
+                {drafting ? (
+                  <Loader2 className="size-3 animate-spin" />
+                ) : (
+                  <Sparkles className="size-3" />
+                )}
+                AI draft from conversation
+              </button>
+            </div>
             <Textarea
               id="fix-note"
               value={fixNote}
               onChange={(e) => setFixNote(e.target.value)}
               required
               rows={4}
-              placeholder="What fixed it? Include concrete files, settings, or commands."
+              placeholder="What fixed it? Include concrete files, settings, or commands. Or click AI draft above to start from the conversation."
             />
           </div>
 
