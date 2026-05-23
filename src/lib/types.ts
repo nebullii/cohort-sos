@@ -84,6 +84,7 @@ export interface SosRequest {
   liveUrl: string;
   timeNeededMinutes: number;
   deadlineAt?: string;
+  githubIssueUrl?: string;
   createdAt: string;
   resolvedAt?: string;
   fixNote?: string;

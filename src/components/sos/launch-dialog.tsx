@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles, Wand2 } from "lucide-react";
+import { Sparkles, Wand2, Download, GitBranch } from "lucide-react";
 import { parseError } from "@/lib/parse-error";
 import {
   Dialog,
@@ -99,6 +99,11 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
   const [repoUrl, setRepoUrl] = useState("");
   const [liveUrl, setLiveUrl] = useState("");
   const [context, setContext] = useState("");
+  const [issueUrl, setIssueUrl] = useState("");
+  const [importStatus, setImportStatus] = useState<
+    "idle" | "loading" | "error"
+  >("idle");
+  const [importError, setImportError] = useState("");
 
   function reset() {
     setTitle("");
@@ -109,6 +114,45 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
     setRepoUrl("");
     setLiveUrl("");
     setContext("");
+    setIssueUrl("");
+    setImportStatus("idle");
+    setImportError("");
+  }
+
+  async function importFromGitHub() {
+    const trimmed = issueUrl.trim();
+    if (!trimmed) return;
+    setImportStatus("loading");
+    setImportError("");
+    try {
+      const res = await fetch(
+        `/api/github/issue?url=${encodeURIComponent(trimmed)}`,
+      );
+      const data = await res.json();
+      if (!res.ok) {
+        setImportError(data.error ?? `Error ${res.status}`);
+        setImportStatus("error");
+        return;
+      }
+      if (data.title && !title) setTitle(data.title.slice(0, 90));
+      if (data.body) {
+        setContext(
+          [
+            data.body,
+            "",
+            "—",
+            `Imported from GitHub issue #${data.number} by @${data.author}`,
+          ]
+            .filter(Boolean)
+            .join("\n"),
+        );
+      }
+      if (data.repoUrl && !repoUrl) setRepoUrl(data.repoUrl);
+      setImportStatus("idle");
+    } catch (err) {
+      setImportError((err as Error).message);
+      setImportStatus("error");
+    }
   }
 
   function applyTemplate() {
@@ -141,6 +185,7 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
       urgency,
       timeNeededMinutes,
       deadlineAt: deadlineAt ? new Date(deadlineAt).toISOString() : undefined,
+      githubIssueUrl: issueUrl,
       repoUrl,
       liveUrl,
       context,
@@ -166,6 +211,45 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="border-border bg-muted/30 space-y-2 rounded-md border p-3">
+            <Label htmlFor="sos-issue" className="text-xs">
+              <GitBranch className="size-3" />
+              Import from GitHub issue
+              <span className="text-muted-foreground ml-1 font-normal">
+                (optional)
+              </span>
+            </Label>
+            <div className="flex gap-1.5">
+              <Input
+                id="sos-issue"
+                value={issueUrl}
+                onChange={(e) => {
+                  setIssueUrl(e.target.value);
+                  setImportError("");
+                }}
+                placeholder="https://github.com/owner/repo/issues/42"
+                className="h-8 flex-1 text-xs"
+              />
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                onClick={importFromGitHub}
+                disabled={!issueUrl.trim() || importStatus === "loading"}
+              >
+                <Download className="size-3.5" />
+                {importStatus === "loading" ? "Fetching…" : "Import"}
+              </Button>
+            </div>
+            {importError ? (
+              <p className="text-red-600 text-xs">{importError}</p>
+            ) : null}
+            <p className="text-muted-foreground text-[11px]">
+              Pulls title, body, and repo URL from the issue. Public repos
+              only (private repos need a token).
+            </p>
+          </div>
+
           <div className="space-y-1.5">
             <Label htmlFor="sos-title">Problem title</Label>
             <Input

@@ -145,6 +145,20 @@ export function Conversation({ sos, onBack }: ConversationProps) {
           {sos.deadlineAt && !resolved ? (
             <DeadlineCountdown deadlineAt={sos.deadlineAt} />
           ) : null}
+          {sos.githubIssueUrl ? (
+            <a
+              href={sos.githubIssueUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="border-border text-muted-foreground hover:text-foreground inline-flex items-center gap-1 rounded-full border bg-background px-2 py-0.5 text-[11px] font-medium"
+              title="Open linked GitHub issue"
+            >
+              <ExternalLink className="size-3 opacity-60" />
+              {sos.githubIssueUrl.match(/issues\/(\d+)/)
+                ? `#${sos.githubIssueUrl.match(/issues\/(\d+)/)![1]}`
+                : "GitHub issue"}
+            </a>
+          ) : null}
           <span className="text-muted-foreground ml-1 text-xs">
             · {sos.timeNeededMinutes} min
           </span>

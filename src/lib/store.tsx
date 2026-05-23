@@ -30,6 +30,7 @@ interface LaunchInput {
   urgency: Urgency;
   timeNeededMinutes: number;
   deadlineAt?: string;
+  githubIssueUrl?: string;
   repoUrl: string;
   liveUrl: string;
   context: string;
@@ -176,6 +177,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       liveUrl: input.liveUrl.trim(),
       timeNeededMinutes: input.timeNeededMinutes,
       deadlineAt: input.deadlineAt || undefined,
+      githubIssueUrl: input.githubIssueUrl?.trim() || undefined,
       createdAt: new Date().toISOString(),
       comments: [],
       rewards: [],
