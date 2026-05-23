@@ -325,6 +325,9 @@ export default function LandingPage() {
             help each other.
           </span>
           <div className="text-muted-foreground flex items-center gap-4">
+            <Link href="/onboarding" className="hover:text-foreground">
+              Onboard your cohort
+            </Link>
             <Link
               href="https://github.com/nebullii/cohort-sos"
               target="_blank"

@@ -1,13 +1,5 @@
-/**
- * Source of truth for Cursor Boston Summer Cohort 1.
- * The cohort organizer maintains a folder of {handle}.json submissions in:
- *   github.com/rogerSuperBuilderAlpha/cursor-boston
- * We hit GitHub's public REST API to verify membership and pull profile data.
- */
-
-const REPO = "rogerSuperBuilderAlpha/cursor-boston";
-const REF = "c1w2comms-submission";
-const DIR = "content/summer-cohort/c1/w2-comms/submissions";
+import type { CohortConfig } from "./cohorts";
+import { BUILT_IN_COHORTS, DEFAULT_COHORT_SLUG, findCohort } from "./cohorts";
 
 export interface CohortSubmission {
   githubHandle: string;
@@ -20,8 +12,17 @@ export interface CohortSubmission {
   competeForWin?: boolean;
 }
 
-export async function fetchCohortRoster(): Promise<CohortSubmission[]> {
-  const url = `https://api.github.com/repos/${REPO}/contents/${DIR}?ref=${REF}`;
+function defaultCohort(): CohortConfig {
+  const c = findCohort(DEFAULT_COHORT_SLUG);
+  if (!c) throw new Error("No default cohort configured");
+  return c;
+}
+
+export async function fetchCohortRoster(
+  cohort: CohortConfig = defaultCohort(),
+): Promise<CohortSubmission[]> {
+  const { owner, repo, ref, path } = cohort.source;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${ref}`;
   const res = await fetch(url, {
     headers: { accept: "application/vnd.github.v3+json" },
     next: { revalidate: 300 },
@@ -51,10 +52,12 @@ export async function fetchCohortRoster(): Promise<CohortSubmission[]> {
 
 export async function verifyCohortMember(
   handle: string,
+  cohort: CohortConfig = defaultCohort(),
 ): Promise<CohortSubmission | null> {
   if (!handle) return null;
   const safe = handle.replace(/^@/, "");
-  const url = `https://api.github.com/repos/${REPO}/contents/${DIR}/${encodeURIComponent(safe)}.json?ref=${REF}`;
+  const { owner, repo, ref, path } = cohort.source;
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}/${encodeURIComponent(safe)}.json?ref=${ref}`;
   const res = await fetch(url, {
     headers: { accept: "application/vnd.github.v3+json" },
     next: { revalidate: 300 },
@@ -66,3 +69,5 @@ export async function verifyCohortMember(
   if (!file.ok) throw new Error(`verify-content ${file.status}`);
   return (await file.json()) as CohortSubmission;
 }
+
+export { BUILT_IN_COHORTS };

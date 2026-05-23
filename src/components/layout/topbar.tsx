@@ -11,6 +11,7 @@ import { LaunchDialog } from "@/components/sos/launch-dialog";
 import { ProfileDialog } from "@/components/sos/profile-dialog";
 import { NotificationsBell } from "@/components/sos/notifications-bell";
 import { UserAvatar } from "@/components/sos/user-avatar";
+import { CohortSwitcher } from "@/components/layout/cohort-switcher";
 import { onShortcut } from "@/lib/shortcut-bus";
 import { cn } from "@/lib/utils";
 
@@ -42,11 +43,7 @@ export function Topbar() {
           <span className="bg-foreground size-2 rounded-full" />
           Cohort SOS
         </Link>
-        {state.cohort?.name ? (
-          <span className="border-border text-muted-foreground hidden h-5 items-center rounded-md border px-1.5 text-[11px] sm:inline-flex">
-            {state.cohort.name}
-          </span>
-        ) : null}
+        <CohortSwitcher />
 
         <nav className="flex items-center gap-1">
           {NAV.map((item) => {

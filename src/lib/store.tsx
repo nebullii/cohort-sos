@@ -11,6 +11,8 @@ import {
 import { createSeed } from "./seed";
 import { pushToast } from "./toast";
 import { notifyDiscord } from "./discord";
+import { BUILT_IN_COHORTS, DEFAULT_COHORT_SLUG } from "./cohorts";
+import { loadDraftCohorts } from "./draft-cohort";
 import { REWARD_POINTS } from "./types";
 import type {
   Cohort,
@@ -47,6 +49,8 @@ interface ResolveInput {
 interface StoreApi {
   state: CohortState;
   hydrated: boolean;
+  activeCohortSlug: string;
+  setActiveCohortSlug: (slug: string) => void;
   launchSos: (input: LaunchInput) => SosRequest;
   claimSos: (sosId: string) => void;
   addComment: (sosId: string, body: string) => void;
@@ -57,6 +61,8 @@ interface StoreApi {
   reset: () => void;
 }
 
+const ACTIVE_SLUG_KEY = "cohortSosActiveSlug";
+
 const StoreContext = createContext<StoreApi | null>(null);
 
 function loadInitial(): CohortState {
@@ -66,6 +72,26 @@ function loadInitial(): CohortState {
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<CohortState>(loadInitial);
   const [hydrated, setHydrated] = useState(false);
+  const [activeCohortSlug, setActiveCohortSlugState] =
+    useState<string>(DEFAULT_COHORT_SLUG);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(ACTIVE_SLUG_KEY);
+      if (stored) setActiveCohortSlugState(stored);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  const setActiveCohortSlug = useCallback((slug: string) => {
+    setActiveCohortSlugState(slug);
+    try {
+      localStorage.setItem(ACTIVE_SLUG_KEY, slug);
+    } catch {
+      /* ignore */
+    }
+  }, []);
 
   useEffect(() => {
     try {
@@ -85,10 +111,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     }
     setHydrated(true);
 
-    // Auto-merge the live cohort roster from the cursor-boston repo.
+    // Auto-merge the live cohort roster from the active cohort's source repo.
     // Adds/refreshes name + photo + project URLs for any handle that
     // exists in our seed; new submissions in the cohort repo append.
-    fetch("/api/cohort/roster")
+    const slugForFetch =
+      (typeof localStorage !== "undefined" &&
+        localStorage.getItem(ACTIVE_SLUG_KEY)) ||
+      DEFAULT_COHORT_SLUG;
+    fetch(`/api/cohort/roster?cohort=${encodeURIComponent(slugForFetch)}`)
       .then((r) => (r.ok ? r.json() : null))
       .then(
         (data: {
@@ -396,6 +426,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     () => ({
       state,
       hydrated,
+      activeCohortSlug,
+      setActiveCohortSlug,
       launchSos,
       claimSos,
       addComment,
@@ -408,6 +440,8 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     [
       state,
       hydrated,
+      activeCohortSlug,
+      setActiveCohortSlug,
       launchSos,
       claimSos,
       addComment,
