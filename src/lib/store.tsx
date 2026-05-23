@@ -52,6 +52,7 @@ interface StoreApi {
   resolveSos: (input: ResolveInput) => void;
   updateProfile: (input: Partial<Pick<User, "name" | "githubHandle" | "skills">>) => void;
   updateCohort: (input: Partial<Cohort>) => void;
+  setCurrentUserByHandle: (handle: string, profile?: Partial<User>) => void;
   reset: () => void;
 }
 
@@ -339,6 +340,47 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     setState((prev) => ({ ...prev, cohort: { ...prev.cohort, ...input } }));
   }, []);
 
+  const setCurrentUserByHandle = useCallback<
+    StoreApi["setCurrentUserByHandle"]
+  >((handle, profile) => {
+    const cleaned = handle.replace(/^@/, "").toLowerCase();
+    setState((prev) => {
+      const existing = prev.users.find(
+        (u) => u.githubHandle.toLowerCase() === cleaned,
+      );
+      if (existing) {
+        return {
+          ...prev,
+          currentUserId: existing.id,
+          users: profile
+            ? prev.users.map((u) =>
+                u.id === existing.id ? { ...u, ...profile } : u,
+              )
+            : prev.users,
+        };
+      }
+      const id = `u${prev.users.length + 1}`;
+      const newUser: User = {
+        id,
+        name: profile?.name ?? handle,
+        githubHandle: handle.replace(/^@/, ""),
+        avatarUrl: profile?.avatarUrl ?? "",
+        skills: profile?.skills ?? [],
+        rescueRep: 0,
+        projectRepoUrl: profile?.projectRepoUrl,
+        projectLiveUrl: profile?.projectLiveUrl,
+        loomUrl: profile?.loomUrl,
+        pitch: profile?.pitch,
+        competeForWin: profile?.competeForWin,
+      };
+      return {
+        ...prev,
+        users: [...prev.users, newUser],
+        currentUserId: id,
+      };
+    });
+  }, []);
+
   const reset = useCallback(() => {
     try {
       localStorage.removeItem(STORAGE_KEY);
@@ -358,6 +400,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       resolveSos,
       updateProfile,
       updateCohort,
+      setCurrentUserByHandle,
       reset,
     }),
     [
@@ -369,6 +412,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       resolveSos,
       updateProfile,
       updateCohort,
+      setCurrentUserByHandle,
       reset,
     ],
   );

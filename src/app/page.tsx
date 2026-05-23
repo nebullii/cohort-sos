@@ -29,6 +29,12 @@ export default function LandingPage() {
             >
               GitHub
             </Link>
+            <Link
+              href="/signin"
+              className={buttonVariants({ size: "sm", variant: "outline" })}
+            >
+              Sign in
+            </Link>
             <Link href="/board" className={buttonVariants({ size: "sm" })}>
               Open app <ArrowRight className="size-3.5" />
             </Link>

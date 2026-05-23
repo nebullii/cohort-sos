@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { href: "/board", label: "Help" },
+  { href: "/cohort", label: "Cohort" },
   { href: "/leaderboard", label: "Leaderboard" },
   { href: "/knowledge", label: "Knowledge" },
 ] as const;
@@ -84,9 +85,11 @@ export function Topbar() {
             )}
           </Button>
           <NotificationsBell />
-          <Button variant="ghost" size="sm" onClick={reset}>
-            Reset
-          </Button>
+          {me?.githubHandle === "nebullii" ? (
+            <Button variant="ghost" size="sm" onClick={reset} title="Dev only">
+              Reset
+            </Button>
+          ) : null}
           <Button size="sm" onClick={() => setLaunchOpen(true)}>
             New SOS
             <kbd className="border-foreground/20 bg-foreground/10 text-foreground/80 ml-1.5 hidden rounded border px-1 text-[10px] font-medium sm:inline-block">

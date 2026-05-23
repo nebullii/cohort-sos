@@ -16,6 +16,9 @@ import {
   NotebookPen,
   Zap,
   Flame,
+  GitBranch,
+  Globe,
+  Play,
 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { useStore } from "@/lib/store";
@@ -219,6 +222,19 @@ export default function LeaderboardPage() {
                     );
                   })}
                 </div>
+                {(user.projectRepoUrl || user.projectLiveUrl || user.loomUrl) ? (
+                  <div className="border-border flex flex-wrap gap-1.5 border-t pt-3">
+                    {user.projectRepoUrl ? (
+                      <ProjectChip href={user.projectRepoUrl} icon={GitBranch} label="Repo" />
+                    ) : null}
+                    {user.projectLiveUrl ? (
+                      <ProjectChip href={user.projectLiveUrl} icon={Globe} label="Live" />
+                    ) : null}
+                    {user.loomUrl ? (
+                      <ProjectChip href={user.loomUrl} icon={Play} label="Loom" />
+                    ) : null}
+                  </div>
+                ) : null}
               </CardContent>
             </Card>
           );
@@ -266,5 +282,27 @@ export default function LeaderboardPage() {
         </div>
       </section>
     </div>
+  );
+}
+
+function ProjectChip({
+  href,
+  icon: Icon,
+  label,
+}: {
+  href: string;
+  icon: typeof GitBranch;
+  label: string;
+}) {
+  return (
+    <a
+      href={href}
+      target="_blank"
+      rel="noreferrer"
+      className="border-border text-muted-foreground hover:text-foreground hover:bg-muted inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-[11px] font-medium transition-colors"
+    >
+      <Icon className="size-3" />
+      {label}
+    </a>
   );
 }

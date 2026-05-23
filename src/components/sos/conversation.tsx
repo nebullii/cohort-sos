@@ -56,6 +56,31 @@ export function Conversation({ sos, onBack }: ConversationProps) {
     }
   }
 
+  function buildShareUrl(): string {
+    if (!sos) return "";
+    const helper = sos.helperIds[0]
+      ? state.users.find((u) => u.id === sos.helperIds[0])?.name
+      : "";
+    const minutes = sos.resolvedAt
+      ? Math.max(
+          1,
+          Math.round(
+            (new Date(sos.resolvedAt).getTime() -
+              new Date(sos.createdAt).getTime()) /
+              60000,
+          ),
+        )
+      : 0;
+    const params = new URLSearchParams({
+      title: sos.title,
+      fix: sos.fixNote ?? "",
+      helper: helper ?? "",
+      category: sos.category,
+      minutes: String(minutes),
+    });
+    return `${window.location.origin}/api/og?${params.toString()}`;
+  }
+
   function handleSend() {
     if (!sos) return;
     const body = draft.trim();
@@ -182,6 +207,15 @@ export function Conversation({ sos, onBack }: ConversationProps) {
                   {sos.fixCommitUrl.replace(/^https?:\/\//, "")}
                 </a>
               ) : null}
+              <a
+                href={buildShareUrl()}
+                target="_blank"
+                rel="noreferrer"
+                className="text-muted-foreground hover:text-foreground ml-3 mt-2 inline-flex items-center gap-1 text-xs"
+              >
+                <ExternalLink className="size-3 opacity-60" />
+                Open share card
+              </a>
             </div>
           </div>
         ) : null}
