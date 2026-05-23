@@ -46,6 +46,11 @@ export interface User {
   avatarUrl: string;
   skills: string[];
   rescueRep: number;
+  projectRepoUrl?: string;
+  projectLiveUrl?: string;
+  loomUrl?: string;
+  pitch?: string;
+  competeForWin?: boolean;
 }
 
 export interface SosComment {

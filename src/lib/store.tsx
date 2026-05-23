@@ -82,6 +82,71 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       /* ignore */
     }
     setHydrated(true);
+
+    // Auto-merge the live cohort roster from the cursor-boston repo.
+    // Adds/refreshes name + photo + project URLs for any handle that
+    // exists in our seed; new submissions in the cohort repo append.
+    fetch("/api/cohort/roster")
+      .then((r) => (r.ok ? r.json() : null))
+      .then(
+        (data: {
+          roster?: Array<{
+            githubHandle: string;
+            name: string;
+            photoUrl?: string;
+            repoUrl?: string;
+            liveUrl?: string;
+            loomUrl?: string;
+            pitch?: string;
+            competeForWin?: boolean;
+          }>;
+        } | null) => {
+          const roster = data?.roster;
+          if (!roster) return;
+          setState((prev) => {
+            const byHandle = new Map(
+              prev.users.map((u) => [u.githubHandle.toLowerCase(), u]),
+            );
+            const merged = [...prev.users];
+            let nextId = prev.users.length + 1;
+            for (const sub of roster) {
+              const key = sub.githubHandle.toLowerCase();
+              const existing = byHandle.get(key);
+              if (existing) {
+                const idx = merged.findIndex((u) => u.id === existing.id);
+                merged[idx] = {
+                  ...existing,
+                  name: sub.name || existing.name,
+                  avatarUrl: sub.photoUrl ?? existing.avatarUrl,
+                  projectRepoUrl: sub.repoUrl ?? existing.projectRepoUrl,
+                  projectLiveUrl: sub.liveUrl ?? existing.projectLiveUrl,
+                  loomUrl: sub.loomUrl ?? existing.loomUrl,
+                  pitch: sub.pitch ?? existing.pitch,
+                  competeForWin: sub.competeForWin ?? existing.competeForWin,
+                };
+              } else {
+                merged.push({
+                  id: `u${nextId++}`,
+                  name: sub.name,
+                  githubHandle: sub.githubHandle,
+                  avatarUrl: sub.photoUrl ?? "",
+                  skills: [],
+                  rescueRep: 0,
+                  projectRepoUrl: sub.repoUrl,
+                  projectLiveUrl: sub.liveUrl,
+                  loomUrl: sub.loomUrl,
+                  pitch: sub.pitch,
+                  competeForWin: sub.competeForWin,
+                });
+              }
+            }
+            return { ...prev, users: merged };
+          });
+        },
+      )
+      .catch(() => {
+        /* offline / 502 — keep seed roster */
+      });
   }, []);
 
   useEffect(() => {
