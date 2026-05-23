@@ -41,16 +41,16 @@ export default function LandingPage() {
         <div className="mx-auto max-w-3xl text-center">
           <div className="border-border bg-muted/40 text-muted-foreground inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs">
             <span className="bg-emerald-500 size-1.5 rounded-full" />
-            Live for cohorts and hackathons
+            Built for Cursor Boston · Summer Cohort 1
           </div>
           <h1 className="text-foreground mt-6 text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
             Unblock stuck builders
             <br className="hidden sm:block" /> in minutes.
           </h1>
           <p className="text-muted-foreground mx-auto mt-5 max-w-xl text-base leading-relaxed sm:text-lg">
-            Cohort SOS is a rescue network for blocked builders. Launch a
-            30-second SOS, get unstuck fast, and turn every fix into searchable
-            cohort memory.
+            A rescue network for the Cursor Boston Summer Cohort. Launch a
+            30-second SOS, get unstuck by a teammate in minutes, and turn every
+            fix into searchable cohort memory.
           </p>
           <div className="mt-8 flex flex-wrap items-center justify-center gap-2">
             <Link href="/board" className={buttonVariants({ size: "lg" })}>

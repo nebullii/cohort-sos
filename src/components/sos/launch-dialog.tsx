@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Wand2 } from "lucide-react";
+import { parseError } from "@/lib/parse-error";
 import {
   Dialog,
   DialogContent,
@@ -112,6 +113,23 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
 
   function applyTemplate() {
     setContext(TEMPLATES[category]);
+  }
+
+  function autoParseFromPaste(text: string) {
+    if (text.length < 60) return;
+    const parsed = parseError(text);
+    if (parsed.title && !title) setTitle(parsed.title);
+    if (parsed.category && category === "Deploy") setCategory(parsed.category);
+    if (parsed.urgency && urgency !== "Deadline Panic") setUrgency(parsed.urgency);
+  }
+
+  const hasErrorShape = context.length > 60 && /\n|Error|error|\.tsx|\.ts/.test(context);
+  function applyParser() {
+    const parsed = parseError(context);
+    if (parsed.title) setTitle(parsed.title);
+    if (parsed.category) setCategory(parsed.category);
+    if (parsed.urgency) setUrgency(parsed.urgency);
+    if (parsed.context) setContext(parsed.context);
   }
 
   function handleSubmit(e: React.FormEvent) {
@@ -253,22 +271,38 @@ export function LaunchDialog({ open, onOpenChange }: LaunchDialogProps) {
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
               <Label htmlFor="sos-context">Context</Label>
-              <button
-                type="button"
-                onClick={applyTemplate}
-                className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
-              >
-                <Sparkles className="size-3" />
-                Use {category} template
-              </button>
+              <div className="flex items-center gap-3">
+                {hasErrorShape ? (
+                  <button
+                    type="button"
+                    onClick={applyParser}
+                    className="text-foreground hover:underline inline-flex items-center gap-1 text-xs font-medium"
+                  >
+                    <Wand2 className="size-3" />
+                    Parse as error
+                  </button>
+                ) : null}
+                <button
+                  type="button"
+                  onClick={applyTemplate}
+                  className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-xs"
+                >
+                  <Sparkles className="size-3" />
+                  Use {category} template
+                </button>
+              </div>
             </div>
             <Textarea
               id="sos-context"
               value={context}
               onChange={(e) => setContext(e.target.value)}
+              onPaste={(e) => {
+                const text = e.clipboardData.getData("text");
+                autoParseFromPaste(text);
+              }}
               required
               rows={6}
-              placeholder="What changed, what you tried, and what error you see"
+              placeholder="Paste an error or describe what's broken. We'll detect Cursor errors and auto-fill."
             />
           </div>
 

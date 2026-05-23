@@ -42,7 +42,7 @@ export function createSeed(): CohortState {
   return {
     currentUserId: "u1",
     cohort: {
-      name: "Cohort 26",
+      name: "Cursor Boston · Summer 1",
       motto: "Ship together, get unblocked together.",
       startedAt: hoursAgo(24 * 14),
     },

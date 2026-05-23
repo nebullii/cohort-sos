@@ -19,15 +19,13 @@ interface ThemeApi {
 const ThemeContext = createContext<ThemeApi | null>(null);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("light");
+  const [theme, setTheme] = useState<Theme>("dark");
 
   useEffect(() => {
     const stored = (typeof localStorage !== "undefined" &&
       localStorage.getItem(KEY)) as Theme | null;
-    const prefersDark =
-      typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches;
-    const initial: Theme = stored ?? (prefersDark ? "dark" : "light");
+    // Default to dark (Cursor aesthetic); only flip if user has explicitly chosen.
+    const initial: Theme = stored ?? "dark";
     setTheme(initial);
   }, []);
 

@@ -13,8 +13,15 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Cohort SOS",
-  description: "Rescue network for blocked builders",
+  title: "Cohort SOS — Rescue network for Cursor Boston Summer 1",
+  description:
+    "Built for Cursor Boston's Summer Cohort. Unblock stuck builders in minutes. Every fix becomes searchable cohort memory.",
+  openGraph: {
+    title: "Cohort SOS — Cursor Boston Summer 1",
+    description:
+      "Built for Cursor Boston's Summer Cohort. Unblock stuck builders in minutes.",
+    type: "website",
+  },
 };
 
 export default function RootLayout({
@@ -23,7 +30,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} h-full antialiased`}>
+    <html
+      lang="en"
+      className={`${inter.variable} dark h-full antialiased`}
+      suppressHydrationWarning
+    >
       <body className="bg-background text-foreground min-h-full font-sans">
         <ThemeProvider>
           <StoreProvider>

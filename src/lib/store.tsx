@@ -10,6 +10,7 @@ import {
 } from "react";
 import { createSeed } from "./seed";
 import { pushToast } from "./toast";
+import { notifyDiscord } from "./discord";
 import { REWARD_POINTS } from "./types";
 import type {
   Cohort,
@@ -113,10 +114,25 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       comments: [],
       rewards: [],
     };
-    setState((prev) => ({
-      ...prev,
-      sosRequests: [sos, ...prev.sosRequests],
-    }));
+    setState((prev) => {
+      const requester = prev.users.find((u) => u.id === prev.currentUserId);
+      notifyDiscord({
+        event: "launched",
+        sos: {
+          id: sos.id,
+          title: sos.title,
+          category: sos.category,
+          urgency: sos.urgency,
+          requesterName: requester?.name ?? "A cohort member",
+          deadlineAt: sos.deadlineAt,
+        },
+        cohortName: prev.cohort?.name ?? "Cohort",
+      });
+      return {
+        ...prev,
+        sosRequests: [sos, ...prev.sosRequests],
+      };
+    });
     return sos;
   }, []);
 
@@ -165,6 +181,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
   const resolveSos = useCallback<StoreApi["resolveSos"]>((input) => {
     let resolvedTitle: string | null = null;
     let totalPoints = 0;
+    let discordPayload: Parameters<typeof notifyDiscord>[0] | null = null;
     setState((prev) => {
       const sos = prev.sosRequests.find((item) => item.id === input.sosId);
       if (!sos) return prev;
@@ -194,6 +211,23 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         (a, b) => a + b,
         0,
       );
+      const helperNames = input.helpers
+        .map((h) => prev.users.find((u) => u.id === h.userId)?.name)
+        .filter((n): n is string => Boolean(n));
+      discordPayload = {
+        event: "resolved",
+        sos: {
+          id: sos.id,
+          title: sos.title,
+          category: sos.category,
+          urgency: sos.urgency,
+          requesterName:
+            prev.users.find((u) => u.id === sos.requesterId)?.name ?? "Someone",
+          fixNote: input.fixNote.trim(),
+          helperNames,
+        },
+        cohortName: prev.cohort?.name ?? "Cohort",
+      };
       return {
         ...prev,
         users: prev.users.map((user) => {
@@ -224,6 +258,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         tone: "success",
       });
     }
+    if (discordPayload) notifyDiscord(discordPayload);
   }, []);
 
   const updateProfile = useCallback<StoreApi["updateProfile"]>((input) => {
