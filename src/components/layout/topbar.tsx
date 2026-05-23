@@ -41,9 +41,11 @@ export function Topbar() {
           <span className="bg-foreground size-2 rounded-full" />
           Cohort SOS
         </Link>
-        <span className="border-border text-muted-foreground hidden h-5 items-center rounded-md border px-1.5 text-[11px] sm:inline-flex">
-          {state.cohort.name}
-        </span>
+        {state.cohort?.name ? (
+          <span className="border-border text-muted-foreground hidden h-5 items-center rounded-md border px-1.5 text-[11px] sm:inline-flex">
+            {state.cohort.name}
+          </span>
+        ) : null}
 
         <nav className="flex items-center gap-1">
           {NAV.map((item) => {

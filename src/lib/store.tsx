@@ -68,7 +68,14 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
-        setState(JSON.parse(saved));
+        const parsed = JSON.parse(saved) as Partial<CohortState>;
+        const seed = createSeed();
+        setState({
+          currentUserId: parsed.currentUserId ?? seed.currentUserId,
+          cohort: parsed.cohort ?? seed.cohort,
+          users: parsed.users ?? seed.users,
+          sosRequests: parsed.sosRequests ?? seed.sosRequests,
+        });
       }
     } catch {
       /* ignore */

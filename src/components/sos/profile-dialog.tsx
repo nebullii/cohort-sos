@@ -26,16 +26,16 @@ export function ProfileDialog({ open, onOpenChange }: ProfileDialogProps) {
   const [name, setName] = useState(me?.name ?? "");
   const [handle, setHandle] = useState(me?.githubHandle ?? "");
   const [skills, setSkills] = useState((me?.skills ?? []).join(", "));
-  const [cohortName, setCohortName] = useState(state.cohort.name);
-  const [cohortMotto, setCohortMotto] = useState(state.cohort.motto);
+  const [cohortName, setCohortName] = useState(state.cohort?.name ?? "");
+  const [cohortMotto, setCohortMotto] = useState(state.cohort?.motto ?? "");
 
   useEffect(() => {
     if (!open) return;
     setName(me?.name ?? "");
     setHandle(me?.githubHandle ?? "");
     setSkills((me?.skills ?? []).join(", "));
-    setCohortName(state.cohort.name);
-    setCohortMotto(state.cohort.motto);
+    setCohortName(state.cohort?.name ?? "");
+    setCohortMotto(state.cohort?.motto ?? "");
   }, [open, me, state.cohort]);
 
   function handleSubmit(e: React.FormEvent) {
